@@ -108,7 +108,6 @@ recheck_threads: dict[str, threading.Thread] = {}
 recheck_cancel_flags: dict[str, threading.Event] = {}
 presence_threads: dict[str, threading.Thread] = {}
 presence_cancel_flags: dict[str, threading.Event] = {}
-deep_enrichment_runtime = None
 
 app = FastAPI(title=APP_NAME)
 
@@ -263,7 +262,7 @@ def _is_mutating_method(method: str) -> bool:
 
 
 def _service_role() -> str:
-    return (os.environ.get("DFP2_SERVICE_ROLE") or "search").strip().lower()
+    return (os.environ.get("DFP2_SERVICE_ROLE") or "core").strip().lower()
 
 def _role_allows_path(role: str, path: str) -> bool:
     if path in {"/", "/health"} or path.startswith("/health"):
@@ -274,7 +273,7 @@ def _role_allows_path(role: str, path: str) -> bool:
         blocked = ("/repository", "/story", "/discovery")
         return not path.startswith(blocked)
     if role == "search":
-        allowed = ("/repository", "/enrichment", "/jobs")
+        allowed = ("/repository", "/jobs")
         return path.startswith(allowed)
     if role in {"story", "ai", "story_ai"}:
         allowed = ("/story", "/discovery", "/jobs")
@@ -596,14 +595,6 @@ def _job_live_state(run_id: str) -> str:
     th = recheck_threads.get(run_id) or story_threads.get(run_id) or presence_threads.get(run_id)
     if th:
         return "running" if th.is_alive() else "not_running"
-    runtime = globals().get("deep_enrichment_runtime")
-    if runtime is not None:
-        try:
-            state = runtime.live_state(run_id)
-            if state != "not_running":
-                return state
-        except Exception:
-            pass
     return "not_running"
 
 
@@ -912,10 +903,6 @@ def jobs_cancel(run_id: str):
         return recheck_cancel(run_id)
     if job_type in {"story", "discovery"} or run_id.startswith(("story", "discovery")):
         return story_cancel(run_id)
-    if job_type == "deep_enrichment" or run_id.startswith("enrich_"):
-        runtime = globals().get("deep_enrichment_runtime")
-        if runtime is not None:
-            return runtime.cancel(run_id)
     return _json(True, run_id=run_id, stage="cancel_requested", cancel_requested=True, live_state=_job_live_state(run_id))
 
 
@@ -5595,6 +5582,7 @@ def story_state_start(state: str, categories: str = "", budget: int = STORY_STAT
 # -----------------------------------------------------------------------------
 WORKSTREAM_DATA_FILE = RUNS_DIR / "workstream_data.json"
 WORKSTREAM_PM_NAMES = ["Milan", "Rachit", "Ipshita", "Avika", "Kamran", "Piyush", "Tanishq"]
+WORKSTREAM_METRIC_KEYS = ["child_progression", "learning_model", "development_ecosystem"]
 DEFAULT_WORKSTREAM_RULES = """Review only expression quality. Do not critique the NGO, the rank, the pathway, the cohort, the source, or whether the PM is right. Do not mention specific NGO facts. Check whether the PM expressed their own judgement clearly enough for consolidation: is there enough length, is the thought process understandable, and does it capture what went through their head? Hinglish, fragments, rough English, spelling mistakes, missing punctuation, and stream-of-consciousness notes are all acceptable. More depth is encouraged. Rank explanations should capture what went through the reviewer’s head, but the review should only ask for more expression, not judge content."""
 DEFAULT_WORKSTREAM_TASKS = [
     {"ngo_name": "Aina Trust", "website": "www.ainatrust.in/about-aina.html", "background": "Early childhood care centres, anganwadi strengthening, nutrition support and education programs for vulnerable young children."},
@@ -5606,6 +5594,73 @@ DEFAULT_TANISHQ_TASKS = [
     {"ngo_name": "Referral NGO 2", "website": "", "background": "Capture NGO details, POC contact number, and referral source."},
     {"ngo_name": "Referral NGO 3", "website": "", "background": "Capture NGO details, POC contact number, and referral source."},
 ]
+
+def _clean_workstream_metric_scores(value):
+    raw = value if isinstance(value, dict) else {}
+    out = {}
+    for key in WORKSTREAM_METRIC_KEYS:
+        row = raw.get(key) if isinstance(raw.get(key), dict) else {}
+        try:
+            rank = int(row.get("rank") or row.get("score") or 3)
+        except Exception:
+            rank = 3
+        rank = min(5, max(1, rank))
+        out[key] = {
+            "rank": rank,
+            "reason": str(row.get("reason") or "")[:6000],
+        }
+    return out
+
+
+def _clean_workstream_exception_override(value):
+    row = value if isinstance(value, dict) else {}
+    enabled_raw = row.get("enabled") if "enabled" in row else row.get("active", row.get("override", False))
+    enabled = enabled_raw is True or str(enabled_raw or "").strip().lower() in {"1", "true", "yes", "on"}
+    try:
+        rank = int(row.get("rank") or row.get("score") or row.get("override_rank") or 3)
+    except Exception:
+        rank = 3
+    return {
+        "enabled": enabled,
+        "rank": min(5, max(1, rank)),
+        "reason": str(row.get("reason") or row.get("override_reason") or "")[:6000],
+    }
+
+
+def _clean_workstream_metric_evidence(value):
+    raw = value if isinstance(value, dict) else {}
+    out = {}
+    for key in WORKSTREAM_METRIC_KEYS:
+        row = raw.get(key) if isinstance(raw.get(key), dict) else {}
+        links = []
+        for i, link in enumerate(row.get("links") or []):
+            if len(links) >= 20:
+                break
+            if isinstance(link, str):
+                label = f"Source {i + 1}"
+                url = link
+            elif isinstance(link, dict):
+                label = str(link.get("label") or f"Source {i + 1}")[:160]
+                url = str(link.get("url") or "")[:1200]
+            else:
+                continue
+            parsed = urlparse(url)
+            if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+                continue
+            links.append({"label": label, "url": url})
+        try:
+            ceiling_rank = int(row.get("ceiling_rank") or row.get("recommended_ceiling") or row.get("max_rank") or 0)
+        except Exception:
+            ceiling_rank = 0
+        ceiling_rank = min(5, max(1, ceiling_rank)) if ceiling_rank else 0
+        out[key] = {
+            "text": str(row.get("text") or "")[:8000],
+            "links": links,
+            "ceiling_rank": ceiling_rank,
+            "ceiling_reason": str(row.get("ceiling_reason") or row.get("recommended_ceiling_reason") or "")[:3000],
+        }
+    return out
+
 
 
 def _default_workstream_payload():
@@ -5627,10 +5682,10 @@ def _default_workstream_payload():
         }
     return {
         "review_rules": DEFAULT_WORKSTREAM_RULES,
+        "scoring_reference_url": "",
         "pms": pms,
         "global_log": [],
         "ai_log": [],
-        "edit_locks": {"all": False, "pms": {}},
         "updated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
     }
 
@@ -5647,16 +5702,12 @@ def _read_workstream_payload():
     except Exception:
         data = _default_workstream_payload()
     data.setdefault("review_rules", DEFAULT_WORKSTREAM_RULES)
+    data.setdefault("scoring_reference_url", "")
     data.setdefault("pms", {})
     data.setdefault("global_log", [])
     data.setdefault("ai_log", [])
-    locks = data.get("edit_locks")
-    if not isinstance(locks, dict):
-        locks = {}
-        data["edit_locks"] = locks
-    locks.setdefault("all", False)
-    if not isinstance(locks.get("pms"), dict):
-        locks["pms"] = {}
+    # Edit locking was removed in v64. Drop any stale lock state from older deployments.
+    data.pop("edit_locks", None)
     for name, default_pm in _default_workstream_payload()["pms"].items():
         cur = data["pms"].setdefault(name, {})
         for k, v in default_pm.items():
@@ -5683,45 +5734,86 @@ def _workstream_check_admin(payload: dict):
 
 
 def _workstream_lock_state(data: dict) -> dict:
-    locks = data.get("edit_locks")
-    if not isinstance(locks, dict):
-        locks = {}
-        data["edit_locks"] = locks
-    locks["all"] = bool(locks.get("all"))
-    if not isinstance(locks.get("pms"), dict):
-        locks["pms"] = {}
-    return locks
+    """Compatibility helper after edit locking was removed.
+
+    Older workstream files may still contain edit_locks. They are discarded and
+    all PM workspaces remain editable.
+    """
+    data.pop("edit_locks", None)
+    return {"all": False, "pms": {}}
 
 
 def _workstream_pm_locked(data: dict, pm_name: str) -> bool:
-    locks = _workstream_lock_state(data)
-    pm_locks = locks.get("pms") if isinstance(locks.get("pms"), dict) else {}
-    return bool(locks.get("all")) or bool(pm_locks.get(pm_name))
+    # PM edit locking was removed at the code level in v64.
+    return False
+
+
+def _workstream_metric_complete(response: dict | None) -> bool:
+    if not isinstance(response, dict):
+        return False
+    if response.get("metric_submitted"):
+        return True
+    raw = response.get("metric_scores")
+    if not isinstance(raw, dict):
+        return False
+    scores = _clean_workstream_metric_scores(raw)
+    metrics_valid = all(
+        1 <= int((scores.get(key) or {}).get("rank") or 0) <= 5
+        and len(str((scores.get(key) or {}).get("reason") or "").strip()) >= 100
+        for key in WORKSTREAM_METRIC_KEYS
+    )
+    exception = _clean_workstream_exception_override(response.get("exception_override"))
+    exception_valid = (
+        not exception.get("enabled")
+        or (
+            1 <= int(exception.get("rank") or 0) <= 5
+            and len(str(exception.get("reason") or "").strip()) >= 100
+        )
+    )
+    return metrics_valid and exception_valid
+
+
+def _workstream_response_complete(pm: dict, response: dict | None) -> bool:
+    if str(pm.get("task_type") or "shortlisting") == "ngo_details":
+        return bool(isinstance(response, dict) and response.get("submitted"))
+    return _workstream_metric_complete(response)
 
 
 def _workstream_recount_pm(pm: dict) -> None:
     responses = pm.get("responses") if isinstance(pm.get("responses"), dict) else {}
-    count = sum(1 for r in responses.values() if isinstance(r, dict) and r.get("submitted"))
+    count = sum(1 for r in responses.values() if _workstream_response_complete(pm, r))
     pm["global_saved_count"] = count
     latest_idx = ""
     latest_at = ""
     for k, r in responses.items():
-        if not isinstance(r, dict) or not r.get("submitted"):
+        if not _workstream_response_complete(pm, r):
             continue
-        submitted_at = str(r.get("submitted_at") or r.get("global_saved_at") or "")
-        if submitted_at >= latest_at:
-            latest_at = submitted_at
+        if str(pm.get("task_type") or "shortlisting") == "ngo_details":
+            completed_at = str(r.get("submitted_at") or r.get("global_saved_at") or "")
+        else:
+            completed_at = str(r.get("metric_submitted_at") or r.get("submitted_at") or r.get("global_saved_at") or "")
+        if completed_at >= latest_at:
+            latest_at = completed_at
             latest_idx = str(k)
     if latest_idx != "":
         try:
-            pm["last_submitted_task_index"] = int(latest_idx)
+            parsed_idx = int(latest_idx)
         except Exception:
-            pm["last_submitted_task_index"] = latest_idx
-        pm["last_submitted_at"] = latest_at
+            parsed_idx = latest_idx
+        if str(pm.get("task_type") or "shortlisting") == "ngo_details":
+            pm["last_submitted_task_index"] = parsed_idx
+            pm["last_submitted_at"] = latest_at
+        else:
+            pm["last_metric_submitted_task_index"] = parsed_idx
+            pm["last_metric_submitted_at"] = latest_at
         pm["global_saved_at"] = latest_at or pm.get("global_saved_at") or ""
     else:
-        pm["last_submitted_task_index"] = ""
-        pm["last_submitted_at"] = ""
+        if str(pm.get("task_type") or "shortlisting") == "ngo_details":
+            pm["last_submitted_task_index"] = ""
+            pm["last_submitted_at"] = ""
+        else:
+            pm["last_metric_submitted_task_index"] = ""
+            pm["last_metric_submitted_at"] = ""
 
 
 def _workstream_reindex_responses_after_task_removal(responses: dict, removed_indices: set[int]) -> dict:
@@ -5916,15 +6008,18 @@ def _workstream_rows(data: dict, only_global: bool = False):
         tasks = pm.get("tasks") or []
         responses = pm.get("responses") or {}
         for idx, response in responses.items():
-            if not isinstance(response, dict) or not response.get("submitted"):
+            if not isinstance(response, dict) or not (response.get("submitted") or _workstream_metric_complete(response)):
                 continue
-            if only_global and not response.get("global_saved"):
+            if only_global and not (response.get("global_saved") or response.get("metric_submitted")):
                 continue
             try:
                 i = int(idx)
             except Exception:
                 i = 0
             task = tasks[i] if i < len(tasks) else {}
+            metric_scores = _clean_workstream_metric_scores(response.get("metric_scores")) if isinstance(response.get("metric_scores"), dict) else {}
+            exception_override = _clean_workstream_exception_override(response.get("exception_override"))
+            metric_evidence = _clean_workstream_metric_evidence(task.get("metric_evidence")) if isinstance(task.get("metric_evidence"), dict) else {}
             rows.append({
                 "pm": pm_name,
                 "task_type": pm.get("task_type", "shortlisting"),
@@ -5936,6 +6031,32 @@ def _workstream_rows(data: dict, only_global: bool = False):
                 "rank": response.get("rank") or response.get("decision") or "",
                 "rank_label": response.get("rank_label") or "",
                 "reason": response.get("reason") or "",
+                "child_progression_rank": (metric_scores.get("child_progression") or {}).get("rank", ""),
+                "child_progression_reason": (metric_scores.get("child_progression") or {}).get("reason", ""),
+                "learning_model_rank": (metric_scores.get("learning_model") or {}).get("rank", ""),
+                "learning_model_reason": (metric_scores.get("learning_model") or {}).get("reason", ""),
+                "development_ecosystem_rank": (metric_scores.get("development_ecosystem") or {}).get("rank", ""),
+                "development_ecosystem_reason": (metric_scores.get("development_ecosystem") or {}).get("reason", ""),
+                "exception_override_enabled": bool(exception_override.get("enabled")),
+                "exception_override_rank": exception_override.get("rank", "") if exception_override.get("enabled") else "",
+                "exception_override_reason": exception_override.get("reason", "") if exception_override.get("enabled") else "",
+                "exception_override_json": json.dumps(exception_override, ensure_ascii=False),
+                "metric_scores_json": json.dumps(metric_scores, ensure_ascii=False) if metric_scores else "",
+                "metric_submitted": bool(response.get("metric_submitted")) or _workstream_metric_complete(response),
+                "metric_submitted_at": response.get("metric_submitted_at") or "",
+                "metric_scoring_version": response.get("metric_scoring_version") or "",
+                "child_progression_evidence": (metric_evidence.get("child_progression") or {}).get("text", ""),
+                "child_progression_evidence_links": json.dumps((metric_evidence.get("child_progression") or {}).get("links", []), ensure_ascii=False),
+                "child_progression_ceiling_rank": (metric_evidence.get("child_progression") or {}).get("ceiling_rank", ""),
+                "child_progression_ceiling_reason": (metric_evidence.get("child_progression") or {}).get("ceiling_reason", ""),
+                "learning_model_evidence": (metric_evidence.get("learning_model") or {}).get("text", ""),
+                "learning_model_evidence_links": json.dumps((metric_evidence.get("learning_model") or {}).get("links", []), ensure_ascii=False),
+                "learning_model_ceiling_rank": (metric_evidence.get("learning_model") or {}).get("ceiling_rank", ""),
+                "learning_model_ceiling_reason": (metric_evidence.get("learning_model") or {}).get("ceiling_reason", ""),
+                "development_ecosystem_evidence": (metric_evidence.get("development_ecosystem") or {}).get("text", ""),
+                "development_ecosystem_evidence_links": json.dumps((metric_evidence.get("development_ecosystem") or {}).get("links", []), ensure_ascii=False),
+                "development_ecosystem_ceiling_rank": (metric_evidence.get("development_ecosystem") or {}).get("ceiling_rank", ""),
+                "development_ecosystem_ceiling_reason": (metric_evidence.get("development_ecosystem") or {}).get("ceiling_reason", ""),
                 "ngo_description": response.get("ngo_description") or "",
                 "contact_number": response.get("contact_number") or response.get("referral_poc") or task.get("contact_number") or "",
                 "referral_source": response.get("referral_source") or task.get("source_mix") or task.get("source") or "",
@@ -6076,6 +6197,23 @@ def workstream_get():
     return _json(True, data=_read_workstream_payload())
 
 
+@app.get("/workstream/storage-info")
+def workstream_storage_info():
+    path = WORKSTREAM_DATA_FILE.resolve()
+    runs_dir = RUNS_DIR.resolve()
+    return _json(
+        True,
+        runs_dir=str(runs_dir),
+        workstream_data_file=str(path),
+        workstream_data_exists=path.exists(),
+        workstream_data_size_bytes=(path.stat().st_size if path.exists() else 0),
+        workspaces_dir=str((RUNS_DIR / "workspaces").resolve()),
+        undo_redo_dir=str((RUNS_DIR / "undo_redo").resolve()),
+        persistent_volume_expected=str(runs_dir).startswith("/data/"),
+        note="PM shortlisting memory is stored in workstream_data.json under RUNS_DIR. On the Railway core service, RUNS_DIR should point to the mounted volume, normally /data/runs.",
+    )
+
+
 @app.post("/workstream/admin/update")
 def workstream_admin_update(payload: dict):
     try:
@@ -6087,6 +6225,13 @@ def workstream_admin_update(payload: dict):
     data = _read_workstream_payload()
     review_rules = str((payload or {}).get("review_rules") or data.get("review_rules") or DEFAULT_WORKSTREAM_RULES)
     data["review_rules"] = review_rules
+    if "scoring_reference_url" in (payload or {}):
+        reference_url = str((payload or {}).get("scoring_reference_url") or "")[:1200]
+        if reference_url:
+            parsed_reference = urlparse(reference_url)
+            if parsed_reference.scheme not in {"http", "https"} or not parsed_reference.netloc:
+                return _json(False, status_code=400, error="Scoring reference URL must be a valid http(s) URL")
+        data["scoring_reference_url"] = reference_url
     pm_name = str((payload or {}).get("pm") or "")
     if pm_name and pm_name in data["pms"]:
         pm = data["pms"][pm_name]
@@ -6109,6 +6254,15 @@ def workstream_admin_update(payload: dict):
                 existing = pm.get("tasks") if isinstance(pm.get("tasks"), list) else []
                 pm["tasks"] = existing + clean
                 # Gearbox only appends tasks. It does not delete existing tasks or reset existing responses.
+        if "evidence_task_index" in (payload or {}) and isinstance((payload or {}).get("metric_evidence"), dict):
+            try:
+                evidence_idx = int((payload or {}).get("evidence_task_index"))
+            except Exception:
+                return _json(False, status_code=400, error="evidence_task_index must be a valid task index")
+            tasks_now = pm.get("tasks") if isinstance(pm.get("tasks"), list) else []
+            if evidence_idx < 0 or evidence_idx >= len(tasks_now):
+                return _json(False, status_code=400, error="evidence_task_index is out of range")
+            tasks_now[evidence_idx]["metric_evidence"] = _clean_workstream_metric_evidence((payload or {}).get("metric_evidence"))
     _write_workstream_payload(data)
     _undo_snapshot_after("workstream_admin_update", "PM view settings/tasks updated", "", paths, undo_before)
     return _json(True, data=data)
@@ -6219,36 +6373,73 @@ def workstream_admin_transfer_tasks(payload: dict):
 
 @app.post("/workstream/admin/lock-edits")
 def workstream_admin_lock_edits(payload: dict):
+    """Backward-compatible no-op.
+
+    Edit locking was removed in v64. This route remains temporarily so an older
+    cached frontend cannot reintroduce a lock or fail unexpectedly.
+    """
     try:
         _workstream_check_admin(payload)
     except HTTPException as e:
         return _json(False, status_code=e.status_code, error=str(e.detail))
-    payload = payload or {}
-    locked = bool(payload.get("locked"))
-    target_all = bool(payload.get("all_pms") or payload.get("all") or str(payload.get("scope") or "").strip().lower() == "all")
-    selected = [str(x).strip() for x in (payload.get("pms") or payload.get("pm_names") or []) if str(x).strip()]
-    if not target_all and not selected:
-        return _json(False, status_code=400, error="Select all PMs or at least one PM")
+    data = _read_workstream_payload()
+    data.pop("edit_locks", None)
+    data = _write_workstream_payload(data)
+    return _json(True, data=data, edit_locks={"all": False, "pms": {}}, locked=False, removed=True, message="PM edit locking has been removed; all PM workspaces are editable.")
 
+
+@app.post("/workstream/submit-metrics")
+def workstream_submit_metrics(payload: dict):
     paths = [WORKSTREAM_DATA_FILE]
     undo_before = _undo_snapshot_before(paths)
     data = _read_workstream_payload()
-    locks = _workstream_lock_state(data)
-    if target_all:
-        locks["all"] = locked
-        target_label = "all PMs"
-    else:
-        pm_locks = locks.setdefault("pms", {})
-        for pm_name in selected:
-            pm_locks[pm_name] = locked
-        target_label = ", ".join(selected)
+    pm_name = str((payload or {}).get("pm") or "")
+    if pm_name not in data["pms"]:
+        return _json(False, status_code=400, error="Unknown PM")
+    pm = data["pms"][pm_name]
+    if str(pm.get("task_type") or "shortlisting") == "ngo_details":
+        return _json(False, status_code=400, error="Metric scoring is not available for NGO-details tasks")
+    try:
+        idx = int((payload or {}).get("task_index"))
+    except Exception:
+        return _json(False, status_code=400, error="task_index is required")
+    if idx < 0 or idx >= len(pm.get("tasks") or []):
+        return _json(False, status_code=400, error="task_index is out of range")
+
+    raw_scores = (payload or {}).get("metric_scores")
+    if not isinstance(raw_scores, dict):
+        return _json(False, status_code=400, error="metric_scores is required")
+    scores = _clean_workstream_metric_scores(raw_scores)
+    task = (pm.get("tasks") or [])[idx]
+    metric_evidence = _clean_workstream_metric_evidence(task.get("metric_evidence")) if isinstance(task.get("metric_evidence"), dict) else {}
+    for key in WORKSTREAM_METRIC_KEYS:
+        row = scores.get(key) or {}
+        if len(str(row.get("reason") or "").strip()) < 100:
+            return _json(False, status_code=400, error=f"{key} reason must be at least 100 characters")
+        ceiling = int((metric_evidence.get(key) or {}).get("ceiling_rank") or 0)
+        if ceiling and int(row.get("rank") or 0) > ceiling:
+            return _json(False, status_code=400, error=f"{key} score exceeds the recommended ceiling of {ceiling}; keep the metric at or below the ceiling and use the single exception override for the overall NGO judgement")
+
+    exception_override = _clean_workstream_exception_override((payload or {}).get("exception_override"))
+    if exception_override.get("enabled") and len(str(exception_override.get("reason") or "").strip()) < 100:
+        return _json(False, status_code=400, error="Exception override reason must be at least 100 characters")
+
     now_s = time.strftime("%Y-%m-%d %H:%M:%S")
-    summary = f"{'Locked' if locked else 'Unlocked'} edits for {target_label}."
-    data.setdefault("global_log", []).insert(0, {"summary": summary, "at": now_s, "edit_locks": locks})
-    data["global_log"] = data["global_log"][:200]
+    responses = pm.setdefault("responses", {})
+    response = responses.get(str(idx)) if isinstance(responses.get(str(idx)), dict) else {}
+    # Preserve the earlier overall ranking and reason exactly as they were.
+    response["metric_scores"] = scores
+    response["exception_override"] = exception_override
+    response["metric_submitted"] = True
+    response["metric_submitted_at"] = now_s
+    response["metric_scoring_version"] = str((payload or {}).get("metric_scoring_version") or "v1.2")[:80]
+    responses[str(idx)] = response
+    pm["last_metric_submitted_task_index"] = idx
+    pm["last_metric_submitted_at"] = now_s
+    _workstream_recount_pm(pm)
     data = _write_workstream_payload(data)
-    _undo_snapshot_after("workstream_lock_edits", summary, "", paths, undo_before)
-    return _json(True, data=data, edit_locks=locks, locked=locked, target="all" if target_all else selected)
+    _undo_snapshot_after("workstream_submit_metrics", f"Three metric scores submitted: {pm_name}", "", paths, undo_before)
+    return _json(True, data=data, metric_submitted_count=pm.get("global_saved_count", 0))
 
 
 @app.post("/workstream/submit")
@@ -6259,8 +6450,6 @@ def workstream_submit(payload: dict):
     pm_name = str((payload or {}).get("pm") or "")
     if pm_name not in data["pms"]:
         return _json(False, status_code=400, error="Unknown PM")
-    if _workstream_pm_locked(data, pm_name):
-        return _json(False, status_code=423, error=f"Edits are locked for {pm_name}. Ask admin to unlock from the gear panel.")
     pm = data["pms"][pm_name]
     try:
         idx = int((payload or {}).get("task_index"))
@@ -6268,15 +6457,21 @@ def workstream_submit(payload: dict):
         return _json(False, status_code=400, error="task_index is required")
     if idx < 0 or idx >= len(pm.get("tasks") or []):
         return _json(False, status_code=400, error="task_index is out of range")
+    existing_response = pm.setdefault("responses", {}).get(str(idx))
+    existing_response = existing_response if isinstance(existing_response, dict) else {}
+    raw_metric_scores = (payload or {}).get("metric_scores")
     response = {
-        "decision": str((payload or {}).get("decision") or ""),
-        "rank": (payload or {}).get("rank") or (payload or {}).get("decision") or "",
-        "rank_label": str((payload or {}).get("rank_label") or ""),
-        "reason": str((payload or {}).get("reason") or ""),
-        "ngo_description": str((payload or {}).get("ngo_description") or ""),
-        "contact_number": str((payload or {}).get("contact_number") or ""),
-        "referral_source": str((payload or {}).get("referral_source") or ""),
-        "referral_poc": str((payload or {}).get("referral_poc") or (payload or {}).get("contact_number") or ""),
+        **existing_response,
+        "decision": str((payload or {}).get("decision") or existing_response.get("decision") or ""),
+        "rank": (payload or {}).get("rank") or (payload or {}).get("decision") or existing_response.get("rank") or existing_response.get("decision") or "",
+        "rank_label": str((payload or {}).get("rank_label") or existing_response.get("rank_label") or ""),
+        "reason": str((payload or {}).get("reason") if "reason" in (payload or {}) else existing_response.get("reason") or ""),
+        "metric_scores": _clean_workstream_metric_scores(raw_metric_scores) if isinstance(raw_metric_scores, dict) else existing_response.get("metric_scores", {}),
+        "exception_override": _clean_workstream_exception_override((payload or {}).get("exception_override")) if "exception_override" in (payload or {}) else existing_response.get("exception_override", {}),
+        "ngo_description": str((payload or {}).get("ngo_description") if "ngo_description" in (payload or {}) else existing_response.get("ngo_description") or ""),
+        "contact_number": str((payload or {}).get("contact_number") if "contact_number" in (payload or {}) else existing_response.get("contact_number") or ""),
+        "referral_source": str((payload or {}).get("referral_source") if "referral_source" in (payload or {}) else existing_response.get("referral_source") or ""),
+        "referral_poc": str((payload or {}).get("referral_poc") or (payload or {}).get("contact_number") or existing_response.get("referral_poc") or ""),
         "submitted": True,
         "submitted_at": time.strftime("%Y-%m-%d %H:%M:%S"),
         "global_saved": True,
@@ -6293,6 +6488,33 @@ def workstream_submit(payload: dict):
     return _json(True, data=data, submitted_count=submitted_count, first_five_due=(submitted_count <= 5))
 
 
+@app.post("/workstream/delete-metrics")
+def workstream_delete_metrics(payload: dict):
+    paths = [WORKSTREAM_DATA_FILE]
+    undo_before = _undo_snapshot_before(paths)
+    data = _read_workstream_payload()
+    pm_name = str((payload or {}).get("pm") or "")
+    if pm_name not in data["pms"]:
+        return _json(False, status_code=400, error="Unknown PM")
+    try:
+        idx = int((payload or {}).get("task_index"))
+    except Exception:
+        return _json(False, status_code=400, error="task_index is required")
+    pm = data["pms"][pm_name]
+    response = pm.setdefault("responses", {}).get(str(idx))
+    if isinstance(response, dict):
+        response.pop("metric_scores", None)
+        response.pop("metric_submitted", None)
+        response.pop("metric_submitted_at", None)
+        response.pop("metric_scoring_version", None)
+        response.pop("exception_override", None)
+        # The legacy decision/rank/reason/submitted fields are deliberately retained.
+    _workstream_recount_pm(pm)
+    data = _write_workstream_payload(data)
+    _undo_snapshot_after("workstream_delete_metrics", f"Three metric scores cleared: {pm_name}", "", paths, undo_before)
+    return _json(True, data=data)
+
+
 @app.post("/workstream/delete-response")
 def workstream_delete_response(payload: dict):
     paths = [WORKSTREAM_DATA_FILE]
@@ -6301,8 +6523,6 @@ def workstream_delete_response(payload: dict):
     pm_name = str((payload or {}).get("pm") or "")
     if pm_name not in data["pms"]:
         return _json(False, status_code=400, error="Unknown PM")
-    if _workstream_pm_locked(data, pm_name):
-        return _json(False, status_code=423, error=f"Edits are locked for {pm_name}. Ask admin to unlock from the gear panel.")
     try:
         idx = int((payload or {}).get("task_index"))
     except Exception:
@@ -6390,7 +6610,20 @@ def workstream_ai_review(payload: dict):
 def workstream_export_csv(global_only: bool = False):
     data = _read_workstream_payload()
     rows = _workstream_rows(data, only_global=global_only)
-    headers = ["pm", "task_type", "task_index", "ngo_name", "website", "background", "decision", "rank", "rank_label", "reason", "ngo_description", "contact_number", "referral_source", "referral_poc", "submitted_at", "global_saved", "global_saved_at", "deadline"]
+    headers = [
+        "pm", "task_type", "task_index", "ngo_name", "website", "background",
+        "decision", "rank", "rank_label", "reason",
+        "child_progression_rank", "child_progression_reason",
+        "learning_model_rank", "learning_model_reason",
+        "development_ecosystem_rank", "development_ecosystem_reason",
+        "exception_override_enabled", "exception_override_rank", "exception_override_reason", "exception_override_json",
+        "metric_scores_json", "metric_submitted", "metric_submitted_at", "metric_scoring_version",
+        "child_progression_evidence", "child_progression_evidence_links", "child_progression_ceiling_rank", "child_progression_ceiling_reason",
+        "learning_model_evidence", "learning_model_evidence_links", "learning_model_ceiling_rank", "learning_model_ceiling_reason",
+        "development_ecosystem_evidence", "development_ecosystem_evidence_links", "development_ecosystem_ceiling_rank", "development_ecosystem_ceiling_reason",
+        "ngo_description", "contact_number", "referral_source", "referral_poc",
+        "submitted_at", "global_saved", "global_saved_at", "deadline",
+    ]
     import io
     buf = io.StringIO()
     writer = csv.DictWriter(buf, fieldnames=headers, extrasaction="ignore")
@@ -6770,6 +7003,94 @@ def _lead_one_line(row: dict) -> str:
 def workspace_lead_pool(region: str):
     rows = _read_lead_pool(region)
     return _json(True, region=region, count=len(rows), rows=rows)
+
+
+@app.get("/workspace/{region}/human-leads/archive")
+def workspace_human_leads_archive(region: str, limit: int = 1000):
+    """Persistent archive of Human Referral rows that reached PM shortlisting.
+
+    It combines Lead Pool memory with old workstream tasks, so a referral remains
+    visible even after it has been assigned, rated, or marked as already rated.
+    """
+    limit = max(1, min(int(limit or 1000), 5000))
+    lead_rows = _read_lead_pool(region)
+    data = _read_workstream_payload()
+
+    ranking_by_lead: dict[str, dict] = {}
+    ranking_by_ref: dict[str, dict] = {}
+    human_tasks: list[dict] = []
+    for row in _workstream_review_candidates(data):
+        source_text = " ".join([
+            str(row.get("source_mix") or ""),
+            str(row.get("referred_by") or ""),
+        ]).lower()
+        item = {
+            "lead_id": row.get("lead_id") or "",
+            "ngo_ref": row.get("ngo_ref") or _ranking_ngo_ref(row),
+            "ngo_name": row.get("ngo_name") or "",
+            "website": row.get("website") or "",
+            "pm_rating": int(row.get("rating") or 0) if row.get("submitted") else "",
+            "pm_comment": row.get("comment") or "",
+            "submitted_at": row.get("submitted_at") or "",
+            "archive_status": "Rated" if row.get("submitted") else "In PM Shortlisting",
+            "source_mix": row.get("source_mix") or "",
+            "referred_by": row.get("referred_by") or "",
+        }
+        if item["lead_id"]:
+            ranking_by_lead[str(item["lead_id"])] = item
+        ranking_by_ref[str(item["ngo_ref"])] = item
+        if "human" in source_text or "referral" in source_text:
+            human_tasks.append(item)
+
+    archived: dict[str, dict] = {}
+    for lead in lead_rows:
+        source_text = " ".join([
+            str(lead.get("source_type") or ""),
+            str(lead.get("source_mix") or ""),
+            str(lead.get("source_tag") or ""),
+        ]).lower()
+        is_human = "human" in source_text or "referral" in source_text or bool(str(lead.get("referred_by") or "").strip())
+        if not is_human:
+            continue
+        ref = _ranking_ngo_ref(lead)
+        ranked = ranking_by_lead.get(str(lead.get("lead_id") or "")) or ranking_by_ref.get(ref) or {}
+        ranking_status = str(lead.get("ranking_status") or "").strip()
+        curation_status = str(lead.get("curation_status") or "").strip().lower()
+        reached_shortlisting = bool(ranked) or ranking_status.lower() not in {"", "not sent", "new"} or curation_status in {"already_rated", "sent_to_ranking", "finalized"}
+        if not reached_shortlisting:
+            continue
+        archive_status = ranked.get("archive_status") or ranking_status or "Sent to PM Shortlisting"
+        row = dict(lead)
+        row.update({
+            "ngo_ref": ref,
+            "archive_status": archive_status,
+            "pm_rating": ranked.get("pm_rating") or "",
+            "pm_comment": ranked.get("pm_comment") or "",
+            "submitted_at": ranked.get("submitted_at") or "",
+            "sent_for_shortlisting_at": lead.get("approved_at") or lead.get("decided_at") or lead.get("updated_at") or "",
+        })
+        archived[ref] = row
+
+    # Backfill referral tasks that pre-date Lead Pool or whose Lead Pool row was
+    # removed. This is the critical part that keeps the old Human Leads visible.
+    for task in human_tasks:
+        ref = str(task.get("ngo_ref") or "")
+        if ref in archived:
+            continue
+        archived[ref] = {
+            **task,
+            "district": "",
+            "source_type": task.get("source_mix") or "Human Referral",
+            "source_tag": "Human Referral",
+            "shortlisting_comment": task.get("pm_comment") or "",
+            "ranking_status": task.get("archive_status") or "In PM Shortlisting",
+            "sent_for_shortlisting_at": task.get("submitted_at") or "",
+            "updated_at": task.get("submitted_at") or "",
+        }
+
+    rows = list(archived.values())
+    rows.sort(key=lambda row: str(row.get("submitted_at") or row.get("sent_for_shortlisting_at") or row.get("updated_at") or row.get("created_at") or ""), reverse=True)
+    return _json(True, region=region, count=len(rows), rows=rows[:limit], truncated=len(rows) > limit)
 
 
 @app.post("/workspace/{region}/lead-pool/import")
@@ -7249,6 +7570,7 @@ def workspace_send_to_ranking(region: str, payload: dict | None = None):
     _undo_snapshot_after("send_to_ranking", f"Sent to PM shortlisting: {new_tasks} task(s)", region, paths, undo_before)
     return _json(True, **batch, data=data)
 
+
 def _rating_to_bucket(rating: int) -> str:
     if rating >= 5:
         return "Final Shortlist"
@@ -7259,72 +7581,437 @@ def _rating_to_bucket(rating: int) -> str:
     return "Reject"
 
 
-@app.get("/ranking/compiled-review")
-def ranking_compiled_review():
-    data = _read_workstream_payload()
-    rows = _workstream_rows(data, only_global=False)
-    grouped = {str(i): [] for i in [5,4,3,2,1]}
-    grouped["pending"] = []
-    pm_counts: dict[str, dict] = {}
+# -----------------------------------------------------------------------------
+# Persistent Final Ranking selections + per-NGO copy overrides (v59/v63)
+# -----------------------------------------------------------------------------
+# This is deliberately a thin persistence layer over the existing PM workstream.
+# Combined Review remains the evidence source; the state below records only:
+#   1) which NGO was explicitly sent forward and to which final tier, and
+#   2) user-edited display text for that NGO in Final Ranking.
+# The original PM responses are never overwritten.
+
+_FINAL_RANKING_LOCK = threading.RLock()
+_FINAL_BUCKETS = {
+    "highest_transformation_potential",
+    "great_ngos",
+    "needs_more_context",
+}
+
+
+def _final_bucket_key(value: str) -> str:
+    raw = re.sub(r"[^a-z0-9]+", "_", str(value or "").strip().lower()).strip("_")
+    aliases = {
+        "final_shortlist": "highest_transformation_potential",
+        "shortlist": "highest_transformation_potential",
+        "highest_transformation_potential": "highest_transformation_potential",
+        "high_transformation_potential": "highest_transformation_potential",
+        "transformation_potential": "highest_transformation_potential",
+        "strong_maybe": "great_ngos",
+        "great_ngos": "great_ngos",
+        "great_ngo": "great_ngos",
+        "maybe": "great_ngos",
+        "needs_follow_up": "needs_more_context",
+        "needs_followup": "needs_more_context",
+        "needs_more_context": "needs_more_context",
+        "worth_a_closer_look": "needs_more_context",
+        "hold": "needs_more_context",
+        "reject": "needs_more_context",
+        "rejected": "needs_more_context",
+    }
+    return aliases.get(raw, "needs_more_context")
+
+
+def _final_bucket_from_rating(rating: int) -> str:
+    if rating >= 5:
+        return "highest_transformation_potential"
+    if rating == 4:
+        return "great_ngos"
+    return "needs_more_context"
+
+
+def _ranking_name_key(value: str) -> str:
+    text = str(value or "").lower()
+    text = re.sub(r"\b(public|charitable|educational|education|seva|social|welfare)\b", " ", text)
+    text = re.sub(r"\b(trust|society|foundation|samsthe|sanstha|ngo|organization|organisation)\b", " ", text)
+    text = re.sub(r"[^a-z0-9]+", " ", text)
+    return " ".join(text.split())
+
+
+def _ranking_ngo_ref(row: dict) -> str:
+    # Keep historical lead IDs unchanged so existing Contact Tracker rows remain
+    # deduplicated. Where there is no lead ID, use a stable normalized name.
+    lead_id = str(row.get("lead_id") or "").strip()
+    if lead_id:
+        return lead_id
+    name = _ranking_name_key(row.get("ngo_name") or row.get("name") or "")
+    if name:
+        return name
+    website = str(row.get("website") or "").strip()
+    if website:
+        try:
+            domain = urlparse(website if website.startswith(("http://", "https://")) else "https://" + website).netloc.lower().replace("www.", "")
+            if domain:
+                return f"domain:{domain}"
+        except Exception:
+            pass
+    return "ngo:" + hashlib.sha1(json.dumps(row, sort_keys=True, default=str).encode("utf-8")).hexdigest()[:16]
+
+
+def _final_ranking_state_path(region: str) -> Path:
+    return _workspace_dir(region or "Karnataka") / "final_ranking_state.json"
+
+
+def _read_final_ranking_state(region: str) -> dict:
+    path = _final_ranking_state_path(region)
+    if not path.exists():
+        return {"version": 1, "region": region, "selections": {}, "overrides": {}, "updated_at": ""}
+    with _FINAL_RANKING_LOCK:
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            data = {}
+    if not isinstance(data, dict):
+        data = {}
+    data.setdefault("version", 1)
+    data.setdefault("region", region)
+    if not isinstance(data.get("selections"), dict):
+        data["selections"] = {}
+    if not isinstance(data.get("overrides"), dict):
+        data["overrides"] = {}
+    data.setdefault("updated_at", "")
+    return data
+
+
+def _write_final_ranking_state(region: str, data: dict) -> dict:
+    path = _final_ranking_state_path(region)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    data["version"] = 1
+    data["region"] = region
+    data["updated_at"] = time.strftime("%Y-%m-%d %H:%M:%S")
+    with _FINAL_RANKING_LOCK:
+        _atomic_write_text(path, json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    return data
+
+
+def _workstream_review_candidates(data: dict) -> list[dict]:
+    rows: list[dict] = []
     for pm_name, pm in (data.get("pms") or {}).items():
-        pm_counts.setdefault(pm_name, {"5":0,"4":0,"3":0,"2":0,"1":0,"total":0})
         tasks = pm.get("tasks") or []
         responses = pm.get("responses") or {}
         for idx, task in enumerate(tasks):
-            resp = responses.get(str(idx)) or {}
-            base_row = {
-                "ngo_name": task.get("ngo_name") or task.get("name") or "",
+            response = responses.get(str(idx)) or {}
+            submitted = isinstance(response, dict) and bool(response.get("submitted"))
+            try:
+                rating = int(float(str(response.get("rank") or response.get("decision") or "0"))) if submitted else 0
+            except Exception:
+                rating = 0
+            row = {
+                "pm": pm_name,
                 "reviewer": pm_name,
-                "website": task.get("website") or "",
-                "one_line_understanding": task.get("one_line_understanding") or _first_sentence(task.get("background") or ""),
-                "background": task.get("background") or "",
-                "source": task.get("source_mix") or "",
                 "task_index": idx,
+                "task_type": pm.get("task_type", "shortlisting"),
+                "ngo_name": task.get("ngo_name") or task.get("name") or "",
+                "website": task.get("website") or "",
+                "background": task.get("background") or "",
+                "one_line_understanding": task.get("one_line_understanding") or _first_sentence(task.get("background") or ""),
+                "lead_id": task.get("lead_id") or "",
+                "source_mix": task.get("source_mix") or task.get("source") or "",
+                "contact_number": task.get("contact_number") or response.get("contact_number") or response.get("referral_poc") or "",
+                "referred_by": task.get("referred_by") or response.get("referral_source") or "",
+                "rating": rating,
+                "rank": rating,
+                "comment": (response.get("reason") or response.get("ngo_description") or "") if submitted else "",
+                "reason": (response.get("reason") or response.get("ngo_description") or "") if submitted else "",
+                "submitted": submitted,
+                "submitted_at": response.get("submitted_at") or "" if submitted else "",
             }
-            if isinstance(resp, dict) and resp.get("submitted"):
-                try: rating = int(float(str(resp.get("rank") or resp.get("decision") or "0")))
-                except Exception: rating = 0
-                base_row.update({"rating": rating, "comment": resp.get("reason") or resp.get("ngo_description") or "", "submitted_at": resp.get("submitted_at") or ""})
-                if str(rating) in grouped:
-                    grouped[str(rating)].append(base_row)
-                    pm_counts[pm_name][str(rating)] += 1
-                    pm_counts[pm_name]["total"] += 1
-            else:
-                grouped["pending"].append(base_row)
-    return _json(True, grouped_by_rating=grouped, pm_counts=pm_counts, pending_count=len(grouped["pending"]), total_rated=sum(v["total"] for v in pm_counts.values()), total_assigned=sum(len((pm.get("tasks") or [])) for pm in (data.get("pms") or {}).values()))
+            row["ngo_ref"] = _ranking_ngo_ref(row)
+            rows.append(row)
+    return rows
+
+
+def _build_final_board_rows(region: str = "Karnataka") -> list[dict]:
+    data = _read_workstream_payload()
+    review_rows = [row for row in _workstream_review_candidates(data) if row.get("submitted") and int(row.get("rating") or 0) > 0]
+    state = _read_final_ranking_state(region)
+    selections = state.get("selections") or {}
+    overrides = state.get("overrides") or {}
+
+    lead_rows = _read_lead_pool(region)
+    by_lead_id = {str(r.get("lead_id") or ""): r for r in lead_rows if r.get("lead_id")}
+    by_name = {_ranking_name_key(r.get("ngo_name") or ""): r for r in lead_rows if _ranking_name_key(r.get("ngo_name") or "")}
+
+    grouped: dict[str, list[dict]] = {}
+    for row in review_rows:
+        grouped.setdefault(str(row.get("ngo_ref") or _ranking_ngo_ref(row)), []).append(row)
+
+    # A stored selection snapshot keeps an explicitly promoted NGO visible even
+    # if the underlying workstream task is later moved or cleaned up.
+    for ref, selection in selections.items():
+        if ref in grouped:
+            continue
+        snapshot = dict((selection or {}).get("snapshot") or {})
+        if snapshot:
+            snapshot["ngo_ref"] = ref
+            snapshot["submitted"] = True
+            snapshot["rating"] = int(snapshot.get("rating") or snapshot.get("pm_rating") or 0)
+            grouped[ref] = [snapshot]
+
+    out: list[dict] = []
+    for ref, rows in grouped.items():
+        rows = sorted(rows, key=lambda r: (int(r.get("rating") or 0), len(str(r.get("comment") or "")), str(r.get("submitted_at") or "")), reverse=True)
+        best = rows[0]
+        lead = by_lead_id.get(str(best.get("lead_id") or "")) or by_name.get(_ranking_name_key(best.get("ngo_name") or "")) or {}
+        ratings = [int(r.get("rating") or 0) for r in rows if int(r.get("rating") or 0) > 0]
+        comments: list[str] = []
+        reviewers: list[str] = []
+        for row in rows:
+            comment = str(row.get("comment") or row.get("reason") or "").strip()
+            if comment and comment not in comments:
+                comments.append(comment)
+            reviewer = str(row.get("reviewer") or row.get("pm") or "").strip()
+            if reviewer and reviewer not in reviewers:
+                reviewers.append(reviewer)
+        max_rating = max(ratings) if ratings else int(best.get("rating") or 0)
+        avg_rating = round(sum(ratings) / len(ratings), 2) if ratings else 0
+        longest_comment = max(comments, key=len) if comments else ""
+        selection = selections.get(ref) or {}
+        override = overrides.get(ref) or {}
+        default_bucket = _final_bucket_from_rating(max_rating)
+        effective_bucket = _final_bucket_key(override.get("final_bucket") or selection.get("final_bucket") or default_bucket)
+        original_name = best.get("ngo_name") or lead.get("ngo_name") or ""
+        original_profile = best.get("one_line_understanding") or lead.get("one_line_understanding") or best.get("background") or lead.get("background_summary") or ""
+        original_comment = longest_comment
+        out.append({
+            "ngo_ref": ref,
+            "lead_id": best.get("lead_id") or lead.get("lead_id") or "",
+            "ngo_name": str(override.get("display_name") if "display_name" in override else original_name),
+            "original_ngo_name": original_name,
+            "website": best.get("website") or lead.get("website") or "",
+            "district": lead.get("district") or "",
+            "source_mix": best.get("source_mix") or lead.get("source_mix") or lead.get("source_type") or "",
+            "background": str(override.get("profile_text") if "profile_text" in override else (best.get("background") or lead.get("background_summary") or original_profile)),
+            "one_line_understanding": str(override.get("profile_text") if "profile_text" in override else original_profile),
+            "original_profile_text": original_profile,
+            "pm_reviewer": " | ".join(reviewers),
+            "pm_reviewers": reviewers,
+            "reviewers": len(reviewers),
+            "pm_rating": max_rating,
+            "avg_rating": avg_rating,
+            "pm_comment": original_comment,
+            "all_pm_comments": comments,
+            "final_comment": str(override.get("final_comment") if "final_comment" in override else original_comment),
+            "original_final_comment": original_comment,
+            "effective_bucket": effective_bucket,
+            "final_bucket": effective_bucket,
+            "selected_for_final": bool(selection),
+            "selected_at": selection.get("selected_at") or "",
+            "selection_source": selection.get("source") or "",
+            "is_override": bool(override),
+            "override_updated_at": override.get("updated_at") or "",
+            "contact_number": best.get("contact_number") or lead.get("contact_number") or lead.get("phone") or "",
+            "referred_by": best.get("referred_by") or lead.get("referred_by") or "",
+        })
+
+    bucket_order = {"highest_transformation_potential": 0, "great_ngos": 1, "needs_more_context": 2}
+    out.sort(key=lambda r: (
+        bucket_order.get(str(r.get("effective_bucket") or ""), 9),
+        0 if r.get("selected_for_final") else 1,
+        -int(r.get("pm_rating") or 0),
+        str(r.get("ngo_name") or "").lower(),
+    ))
+    rank_by_bucket: dict[str, int] = {}
+    for row in out:
+        bucket = str(row.get("effective_bucket") or "needs_more_context")
+        rank_by_bucket[bucket] = rank_by_bucket.get(bucket, 0) + 1
+        row["final_rank"] = str(rank_by_bucket[bucket])
+    return out
+
+
+@app.get("/ranking/compiled-review")
+def ranking_compiled_review(region: str = "Karnataka"):
+    data = _read_workstream_payload()
+    final_state = _read_final_ranking_state(region)
+    selections = final_state.get("selections") or {}
+    grouped = {str(i): [] for i in [5,4,3,2,1]}
+    grouped["pending"] = []
+    pm_counts: dict[str, dict] = {}
+    for row in _workstream_review_candidates(data):
+        pm_name = str(row.get("reviewer") or row.get("pm") or "")
+        pm_counts.setdefault(pm_name, {"5":0,"4":0,"3":0,"2":0,"1":0,"total":0})
+        base_row = {
+            "ngo_ref": row.get("ngo_ref"),
+            "lead_id": row.get("lead_id") or "",
+            "ngo_name": row.get("ngo_name") or "",
+            "reviewer": pm_name,
+            "website": row.get("website") or "",
+            "one_line_understanding": row.get("one_line_understanding") or "",
+            "background": row.get("background") or "",
+            "source": row.get("source_mix") or "",
+            "task_index": row.get("task_index"),
+            "selected_for_final": bool(selections.get(str(row.get("ngo_ref") or ""))),
+            "final_bucket": (selections.get(str(row.get("ngo_ref") or "")) or {}).get("final_bucket") or "",
+        }
+        if row.get("submitted"):
+            rating = int(row.get("rating") or 0)
+            base_row.update({"rating": rating, "comment": row.get("comment") or "", "submitted_at": row.get("submitted_at") or ""})
+            if str(rating) in grouped:
+                grouped[str(rating)].append(base_row)
+                pm_counts[pm_name][str(rating)] += 1
+                pm_counts[pm_name]["total"] += 1
+        else:
+            grouped["pending"].append(base_row)
+    return _json(
+        True,
+        region=region,
+        grouped_by_rating=grouped,
+        pm_counts=pm_counts,
+        pending_count=len(grouped["pending"]),
+        total_rated=sum(v["total"] for v in pm_counts.values()),
+        total_assigned=sum(len((pm.get("tasks") or [])) for pm in (data.get("pms") or {}).values()),
+        final_selection_count=len(selections),
+    )
+
+
+@app.post("/ranking/final-selection")
+def ranking_final_selection(payload: dict | None = None):
+    payload = payload or {}
+    region = str(payload.get("region") or "Karnataka")
+    requested = [str(x).strip() for x in (payload.get("ngo_refs") or []) if str(x).strip()]
+    if not requested:
+        one = str(payload.get("ngo_ref") or "").strip()
+        if one:
+            requested = [one]
+    if not requested:
+        return _json(False, status_code=400, error="ngo_ref or ngo_refs is required")
+    bucket = _final_bucket_key(payload.get("final_bucket") or payload.get("bucket") or "highest_transformation_potential")
+    if bucket not in _FINAL_BUCKETS:
+        return _json(False, status_code=400, error="Invalid final_bucket")
+
+    candidates: dict[str, list[dict]] = {}
+    for row in _workstream_review_candidates(_read_workstream_payload()):
+        if not row.get("submitted") or int(row.get("rating") or 0) <= 0:
+            continue
+        candidates.setdefault(str(row.get("ngo_ref") or ""), []).append(row)
+
+    path = _final_ranking_state_path(region)
+    undo_before = _undo_snapshot_before([path])
+    state = _read_final_ranking_state(region)
+    selections = state.setdefault("selections", {})
+    now_s = time.strftime("%Y-%m-%d %H:%M:%S")
+    sent = 0
+    updated = 0
+    skipped: list[dict] = []
+    for ref in dict.fromkeys(requested):
+        rows = candidates.get(ref) or []
+        if not rows:
+            skipped.append({"ngo_ref": ref, "reason": "not_found_in_submitted_combined_review"})
+            continue
+        rows = sorted(rows, key=lambda r: (int(r.get("rating") or 0), len(str(r.get("comment") or ""))), reverse=True)
+        best = rows[0]
+        existing = selections.get(ref)
+        snapshot = {
+            "ngo_ref": ref,
+            "lead_id": best.get("lead_id") or "",
+            "ngo_name": best.get("ngo_name") or "",
+            "website": best.get("website") or "",
+            "background": best.get("background") or "",
+            "one_line_understanding": best.get("one_line_understanding") or "",
+            "rating": int(best.get("rating") or 0),
+            "comment": best.get("comment") or "",
+            "source_mix": best.get("source_mix") or "",
+        }
+        selections[ref] = {
+            "ngo_ref": ref,
+            "final_bucket": bucket,
+            "selected_at": existing.get("selected_at") if isinstance(existing, dict) and existing.get("selected_at") else now_s,
+            "updated_at": now_s,
+            "source": "combined_review",
+            "snapshot": snapshot,
+        }
+        if existing:
+            updated += 1
+        else:
+            sent += 1
+    _write_final_ranking_state(region, state)
+    _workspace_log(region, "ranking_final_selection", {"sent_count": sent, "updated_count": updated, "bucket": bucket, "ngo_refs": requested[:100], "skipped": skipped[:100]})
+    _undo_snapshot_after("ranking_final_selection", f"Combined Review → Final Ranking: {sent} new, {updated} updated", region, [path], undo_before)
+    return _json(True, region=region, final_bucket=bucket, sent_count=sent, updated_count=updated, selected_count=sent + updated, skipped_count=len(skipped), skipped=skipped[:100])
+
+
+@app.post("/ranking/final-overrides/update")
+def ranking_final_override_update(payload: dict | None = None):
+    payload = payload or {}
+    region = str(payload.get("region") or "Karnataka")
+    ref = str(payload.get("ngo_ref") or "").strip()
+    if not ref:
+        return _json(False, status_code=400, error="ngo_ref is required")
+    path = _final_ranking_state_path(region)
+    undo_before = _undo_snapshot_before([path])
+    state = _read_final_ranking_state(region)
+    overrides = state.setdefault("overrides", {})
+    if payload.get("reset") is True:
+        existed = ref in overrides
+        overrides.pop(ref, None)
+        _write_final_ranking_state(region, state)
+        _workspace_log(region, "ranking_final_override_reset", {"ngo_ref": ref, "existed": existed})
+        _undo_snapshot_after("ranking_final_override_reset", "Final Ranking NGO text restored", region, [path], undo_before)
+        return _json(True, region=region, ngo_ref=ref, reset=True, existed=existed)
+
+    valid_refs = {str(row.get("ngo_ref") or "") for row in _build_final_board_rows(region)}
+    if ref not in valid_refs:
+        return _json(False, status_code=404, error="NGO was not found in Final Ranking")
+    current = dict(overrides.get(ref) or {})
+    for field in ("display_name", "profile_text", "final_comment"):
+        if field in payload:
+            current[field] = str(payload.get(field) or "")
+    if "final_bucket" in payload:
+        current["final_bucket"] = _final_bucket_key(payload.get("final_bucket") or "")
+    current["updated_at"] = time.strftime("%Y-%m-%d %H:%M:%S")
+    overrides[ref] = current
+    _write_final_ranking_state(region, state)
+    _workspace_log(region, "ranking_final_override_update", {"ngo_ref": ref, "fields": sorted(k for k in payload if k in {"display_name", "profile_text", "final_comment", "final_bucket"})})
+    _undo_snapshot_after("ranking_final_override_update", "Final Ranking NGO text updated", region, [path], undo_before)
+    return _json(True, region=region, ngo_ref=ref, override=current)
 
 
 @app.get("/ranking/final-board")
-def ranking_final_board():
-    data = _read_workstream_payload()
-    rows = _workstream_rows(data, only_global=False)
-    out = []
+def ranking_final_board(region: str = "Karnataka"):
+    rows = _build_final_board_rows(region)
+    grouped = {key: [] for key in ["highest_transformation_potential", "great_ngos", "needs_more_context"]}
     for row in rows:
-        try: rating = int(float(str(row.get("rank") or row.get("decision") or "0")))
-        except Exception: rating = 0
-        out.append({
-            "ngo_name": row.get("ngo_name"), "website": row.get("website"), "background": row.get("background"),
-            "pm_reviewer": row.get("pm"), "pm_rating": rating, "pm_comment": row.get("reason"),
-            "effective_bucket": _rating_to_bucket(rating), "is_override": False, "final_rank": "", "final_comment": "",
-        })
-    out.sort(key=lambda r: (r.get("pm_rating") or 0, r.get("ngo_name") or ""), reverse=True)
-    return _json(True, count=len(out), rows=out)
+        grouped.setdefault(_final_bucket_key(row.get("effective_bucket") or ""), []).append(row)
+    return _json(
+        True,
+        region=region,
+        count=len(rows),
+        rows=rows,
+        grouped_by_bucket=grouped,
+        explicitly_selected_count=sum(1 for row in rows if row.get("selected_for_final")),
+        override_count=sum(1 for row in rows if row.get("is_override")),
+    )
 
 
 @app.get("/ranking/final-summary")
-def ranking_final_summary():
-    data = _read_workstream_payload()
-    rows = _workstream_rows(data, only_global=False)
+def ranking_final_summary(region: str = "Karnataka"):
+    rows = _build_final_board_rows(region)
     rating_counts = {str(i): 0 for i in [5,4,3,2,1]}
-    bucket_counts: dict[str, int] = {}
+    bucket_counts = {key: 0 for key in ["highest_transformation_potential", "great_ngos", "needs_more_context"]}
     for row in rows:
-        try: rating = int(float(str(row.get("rank") or row.get("decision") or "0")))
-        except Exception: rating = 0
+        rating = int(row.get("pm_rating") or 0)
         if str(rating) in rating_counts:
             rating_counts[str(rating)] += 1
-        bucket = _rating_to_bucket(rating)
+        bucket = _final_bucket_key(row.get("effective_bucket") or "")
         bucket_counts[bucket] = bucket_counts.get(bucket, 0) + 1
-    return _json(True, total_reviewed=len(rows), rating_distribution=rating_counts, final_buckets=bucket_counts, total_assigned=sum(len((pm.get("tasks") or [])) for pm in (data.get("pms") or {}).values()))
+    return _json(
+        True,
+        region=region,
+        total_reviewed=len(rows),
+        rating_distribution=rating_counts,
+        final_buckets=bucket_counts,
+        explicitly_selected_count=sum(1 for row in rows if row.get("selected_for_final")),
+        total_assigned=sum(len((pm.get("tasks") or [])) for pm in (_read_workstream_payload().get("pms") or {}).values()),
+    )
 
 
 
@@ -7397,8 +8084,9 @@ def _bucket_key(value: str) -> str:
     text = re.sub(r"[^a-z0-9]+", "_", text).strip("_")
     aliases = {
         "final_shortlist": "final_shortlist", "shortlist": "final_shortlist",
-        "strong_maybe": "strong_maybe", "maybe": "strong_maybe",
-        "needs_follow_up": "needs_follow_up", "follow_up": "needs_follow_up",
+        "highest_transformation_potential": "final_shortlist", "transformation_potential": "final_shortlist",
+        "strong_maybe": "strong_maybe", "maybe": "strong_maybe", "great_ngos": "strong_maybe",
+        "needs_follow_up": "needs_follow_up", "follow_up": "needs_follow_up", "needs_more_context": "needs_follow_up",
         "hold": "hold", "reject": "reject", "rejected": "reject",
     }
     return aliases.get(text, text)
@@ -7416,7 +8104,7 @@ def _bucket_label(value: str) -> str:
 
 
 def _row_ngo_ref(row: dict) -> str:
-    return str(row.get("ngo_ref") or row.get("lead_id") or _normalise_lead_name(row.get("ngo_name") or "") or row.get("ngo_name") or "").strip()
+    return str(row.get("ngo_ref") or _ranking_ngo_ref(row)).strip()
 
 
 def _domain_from_url(value: str) -> str:
@@ -7431,42 +8119,27 @@ def _domain_from_url(value: str) -> str:
 
 
 def _final_rows_for_tracker(region: str = "Karnataka") -> list[dict]:
-    data = _read_workstream_payload()
-    rows = _workstream_rows(data, only_global=False)
-    lead_rows = _read_lead_pool(region)
-    by_lead_id = {str(r.get("lead_id") or ""): r for r in lead_rows if r.get("lead_id")}
-    by_name = {_normalise_lead_name(r.get("ngo_name") or ""): r for r in lead_rows if _normalise_lead_name(r.get("ngo_name") or "")}
-    out = []
-    rank_by_bucket: dict[str, int] = {}
-    for row in rows:
-        try:
-            rating = int(float(str(row.get("rank") or row.get("decision") or "0")))
-        except Exception:
-            rating = 0
-        if not rating:
-            continue
-        lead = by_lead_id.get(str(row.get("lead_id") or "")) or by_name.get(_normalise_lead_name(row.get("ngo_name") or "")) or {}
-        bucket = _rating_to_bucket(rating)
-        bkey = _bucket_key(bucket)
-        rank_by_bucket[bkey] = rank_by_bucket.get(bkey, 0) + 1
+    board_rows = _build_final_board_rows(region)
+    out: list[dict] = []
+    for row in board_rows:
+        bucket_key = _bucket_key(row.get("effective_bucket") or row.get("final_bucket") or "")
         out.append({
             "ngo_ref": _row_ngo_ref(row),
-            "lead_id": row.get("lead_id") or lead.get("lead_id") or "",
-            "ngo_name": row.get("ngo_name") or lead.get("ngo_name") or "",
-            "district": lead.get("district") or "",
-            "final_rank": str(rank_by_bucket[bkey]),
-            "final_bucket": bucket,
-            "website": row.get("website") or lead.get("website") or "",
-            "source_mix": row.get("source_mix") or lead.get("source_mix") or lead.get("source_type") or row.get("referral_source") or "",
-            "contact_number": row.get("contact_number") or lead.get("contact_number") or lead.get("phone") or "",
-            "referred_by": row.get("referral_poc") or lead.get("referred_by") or "",
-            "pm_reviewer": row.get("pm") or "",
-            "pm_rating": str(rating),
-            "pm_comment": row.get("reason") or row.get("ngo_description") or "",
-            "background": row.get("background") or lead.get("background_summary") or "",
-            "one_line_understanding": row.get("one_line_understanding") or lead.get("one_line_understanding") or _first_sentence(row.get("background") or lead.get("background_summary") or ""),
+            "lead_id": row.get("lead_id") or "",
+            "ngo_name": row.get("ngo_name") or "",
+            "district": row.get("district") or "",
+            "final_rank": row.get("final_rank") or "",
+            "final_bucket": _bucket_label(bucket_key),
+            "website": row.get("website") or "",
+            "source_mix": row.get("source_mix") or "",
+            "contact_number": row.get("contact_number") or "",
+            "referred_by": row.get("referred_by") or "",
+            "pm_reviewer": row.get("pm_reviewer") or "",
+            "pm_rating": str(row.get("pm_rating") or ""),
+            "pm_comment": row.get("final_comment") or row.get("pm_comment") or "",
+            "background": row.get("background") or "",
+            "one_line_understanding": row.get("one_line_understanding") or _first_sentence(row.get("background") or ""),
         })
-    out.sort(key=lambda r: (_bucket_key(r.get("final_bucket")) != "final_shortlist", -(int(r.get("pm_rating") or 0)), int(r.get("final_rank") or 999999)))
     return out
 
 
@@ -8535,7 +9208,7 @@ def admin_cleanup_old_runs(payload: dict):
     delete_undo = bool(payload.get("delete_undo"))
     protect_imported = str(payload.get("protect_imported", "true")).lower() not in {"0", "false", "no"}
     protected = _protected_lead_pool_run_ids() if protect_imported else set()
-    prefixes = ("run_", "recheck_", "presence_", "story", "discovery", "enrich_")
+    prefixes = ("run_", "recheck_", "presence_", "story", "discovery")
     candidates = [p for p in RUNS_DIR.iterdir() if p.is_dir() and p.name.startswith(prefixes)]
     candidates.sort(key=lambda p: p.stat().st_mtime, reverse=True)
     protected_candidates = [p for p in candidates if p.name in protected]
@@ -8579,33 +9252,3 @@ def admin_cleanup_old_runs(payload: dict):
         deleted_undo=bool(confirm and delete_undo),
         note="Lead-Pool-imported runs are protected and were not deleted." if protect_imported else "Imported-run protection disabled by payload.",
     )
-
-
-# -----------------------------------------------------------------------------
-# V60 Deep Enrichment — Firecrawl multi-key failover + Serper evidence collection
-# -----------------------------------------------------------------------------
-# Registered at the end so the module can reuse the hardened persistence, SSRF,
-# Serper failover, job registry, CORS, and mutation-auth helpers above.
-import importlib.util as _importlib_util
-
-_deep_spec = _importlib_util.spec_from_file_location("dfp2_deep_enrichment", Path(__file__).resolve().parent / "deep_enrichment.py")
-if _deep_spec is None or _deep_spec.loader is None:
-    raise RuntimeError("Could not load deep_enrichment.py")
-_deep_module = _importlib_util.module_from_spec(_deep_spec)
-_deep_spec.loader.exec_module(_deep_module)
-
-deep_enrichment_runtime = _deep_module.register_deep_enrichment(
-    app,
-    runs_dir=RUNS_DIR,
-    serper_post=_serper_post,
-    has_serper_keys=_has_serper_keys,
-    safe_fetch_text=_safe_fetch_text,
-    validate_public_url=_validate_public_http_url,
-    make_soup=_make_soup,
-    get_anthropic=_get_anthropic,
-    job_create=_job_create,
-    job_update=_job_update,
-    job_request_cancel=_job_request_cancel,
-    job_cancel_requested=_job_cancel_requested,
-    utc_now_iso=_utc_now_iso,
-)

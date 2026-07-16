@@ -1,0 +1,16 @@
+{
+  "run_id": "jobtest_cf63cd20",
+  "job_type": "unit_test",
+  "status": "interrupted",
+  "stage": "interrupted_restart",
+  "run_dir": "/mnt/data/remove_lock_backend/backend/runs/jobtest_cf63cd20",
+  "owner_pid": 22454,
+  "cancel_requested": true,
+  "created_at": "2026-07-16T06:44:02Z",
+  "total": 10,
+  "processed": 4,
+  "updated_at": "2026-07-16T06:44:02Z",
+  "cancel_requested_at": "2026-07-16T06:44:02Z",
+  "interrupted_at": "2026-07-16T06:44:02Z",
+  "live_state": "not_running"
+}
