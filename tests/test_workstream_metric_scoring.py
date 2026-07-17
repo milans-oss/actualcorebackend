@@ -317,8 +317,28 @@ def test_all_neutral_evidence_packs_are_available_and_have_sources_only():
         "PRACHODANA NGO - Open Shelter Programme": "prachodana_open_shelter",
         "Rebuild India Foundation": "rebuild_india_foundation",
         "SAMARPAN": "samarpan_foundation",
+        "AGASTYA INTERNATIONAL FOUNDATION": "agastya_international_foundation",
+        "Angels Orphanage": "angels_orphanage_bengaluru",
+        "ANUGRAHA EDUCATIONAL AND SOCIAL TRUST": "anugraha_educational_and_social_trust",
+        "BHARATH SEVA SANGH": "bharath_seva_sangh_sampatthu",
+        "BOSCO": "bosco_bengaluru",
+        "Child Empowerment Foundation India": "child_empowerment_foundation_bal_utsav",
+        "Christ Special School": "christ_special_school",
+        "FAMIN EDUCATIONAL AND SOCIAL WELFARE TRUST": "famin_educational_and_social_welfare_trust",
+        "HAZARI PRASAD FOUNDATION": "hazari_prasad_foundation",
+        "INTERNATIONAL HUMAN DEVELOPMENT AND UPLIFTMENT ACADEMY": "international_human_development_and_upliftment_academy",
+        "Namma Bhoomi — Concern for Working Children": "namma_bhoomi_concerned_for_working_children",
+        "PRASHANTHI BALAMANDIRA TRUST": "prashanthi_balamandira_trust",
+        "RIGHT TO PLAY FOUNDATION": "right_to_play_foundation_india",
+        "Savera Homes": "savera_homes_basera_childrens_village",
+        "SHRI B. D. TATTI MEMORIAL CHARITABLE TRUST": "shri_b_d_tatti_memorial_charitable_trust",
+        "SNEHADEEP TRUST FOR THE DISABLED": "snehadeep_trust_for_the_disabled",
+        "SPASTICS SOCIETY OF KARNATAKA": "spastics_society_of_karnataka",
+        "SRI SURESH GURUJI SEVA TRUST": "sri_suresh_guruji_seva_trust",
+        "SUKANKSHA CHARITABLE TRUST": "sukanksha_charitable_trust",
+        "SWAPAKSH LEARNING FOUNDATION": "swapaksh_learning_foundation",
     }
-    assert len(main.WORKSTREAM_EVIDENCE_PRESETS) == 25
+    assert len(main.WORKSTREAM_EVIDENCE_PRESETS) == 60
     for ngo_name, expected_id in expected.items():
         preset_id, preset = main._workstream_find_evidence_preset(ngo_name)
         assert preset_id == expected_id

@@ -1,0 +1,13 @@
+{
+  "run_id": "jobtest_31b1e3ac",
+  "job_type": "unit_test",
+  "status": "interrupted",
+  "stage": "interrupted_restart",
+  "run_dir": "/mnt/data/piyush_v69/backend/runs/jobtest_31b1e3ac",
+  "owner_pid": 7796,
+  "cancel_requested": false,
+  "created_at": "2026-07-17T10:35:33Z",
+  "updated_at": "2026-07-17T10:35:33Z",
+  "interrupted_at": "2026-07-17T10:35:33Z",
+  "live_state": "not_running"
+}
