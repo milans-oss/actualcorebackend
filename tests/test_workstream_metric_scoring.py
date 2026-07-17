@@ -213,3 +213,120 @@ def test_stale_edit_locks_are_ignored_and_removed(tmp_path, monkeypatch):
     assert compatibility["locked"] is False
     assert compatibility["removed"] is True
     assert "edit_locks" not in compatibility["data"]
+
+
+def test_named_ngo_evidence_presets_migrate_without_prefilling_rankings(tmp_path, monkeypatch):
+    _configure(tmp_path, monkeypatch)
+    data = main._read_workstream_payload()
+    data["pms"]["Milan"]["tasks"] = [
+        {
+            "ngo_name": "SREE SIDDAGANGA MATH, TUMAKURU",
+            "website": "https://siddagangamath.org/siddaganga/home.html",
+            "background": "Existing assignment background.",
+            "metric_evidence": {
+                "child_progression": {
+                    "text": "Earlier admin note that must remain available.",
+                    "links": [{"label": "Earlier source", "url": "https://example.org/earlier"}],
+                    "ceiling_rank": 5,
+                    "ceiling_reason": "Earlier ceiling that must be removed.",
+                }
+            },
+        },
+        {"ngo_name": "SRI VISHWESHA DHAMA GURUKULAM", "website": "https://www.svdgurukulam.org/programs"},
+        {"ngo_name": "TADIMETY RADHAKRISHNA CHARITABLE TRUST", "website": "https://www.trct.org/"},
+        {
+            "ngo_name": "SREE SIDDAGANGA MATH OLD V65 COPY",
+            "metric_evidence_preset_id": "sree_siddaganga_math",
+            "metric_evidence_preset_version": "v65-three-ngo-evidence-2026-07-17",
+            "metric_evidence": {
+                "child_progression": {
+                    "text": "Old v65 generated evidence text that should be replaced.",
+                    "links": [{"label": "Old generated source", "url": "https://example.org/old-generated"}],
+                    "ceiling_rank": 2,
+                    "ceiling_reason": "Old generated score guidance.",
+                },
+                "learning_model": {"text": "Old v65 learning text.", "links": [], "ceiling_rank": 2},
+                "development_ecosystem": {"text": "Old v65 ecosystem text.", "links": [], "ceiling_rank": 4},
+            },
+        },
+    ]
+    data["pms"]["Milan"]["responses"] = {
+        "0": {"rank": 2, "reason": "Existing overall response must remain untouched.", "submitted": True}
+    }
+    main._write_workstream_payload(data)
+
+    migrated = main._read_workstream_payload()
+    tasks = migrated["pms"]["Milan"]["tasks"]
+
+    siddaganga = tasks[0]
+    assert siddaganga["metric_evidence_preset_version"] == main.WORKSTREAM_EVIDENCE_PRESETS_VERSION
+    assert "Old Boys Association" in siddaganga["metric_evidence"]["child_progression"]["text"]
+    assert "Earlier admin note" in siddaganga["metric_evidence"]["child_progression"]["text"]
+    assert any(link["url"] == "https://example.org/earlier" for link in siddaganga["metric_evidence"]["child_progression"]["links"])
+
+    vishwesha = tasks[1]
+    assert "Aditi and Aneesha" in vishwesha["metric_evidence"]["child_progression"]["text"]
+    assert "six-year classical curriculum" in vishwesha["metric_evidence"]["learning_model"]["text"]
+
+    trct = tasks[2]
+    assert "more than 8,600" in trct["metric_evidence"]["child_progression"]["text"]
+
+    old_v65 = tasks[3]
+    assert "Old v65 generated evidence text" not in old_v65["metric_evidence"]["child_progression"]["text"]
+    assert not any(link["url"] == "https://example.org/old-generated" for link in old_v65["metric_evidence"]["child_progression"]["links"])
+
+    for task in tasks:
+        for metric_key in main.WORKSTREAM_METRIC_KEYS:
+            row = task["metric_evidence"][metric_key]
+            assert row["ceiling_rank"] == 0
+            assert row["ceiling_reason"] == ""
+
+    assert migrated["pms"]["Milan"]["responses"]["0"]["rank"] == 2
+    assert migrated["pms"]["Milan"]["responses"]["0"]["reason"] == "Existing overall response must remain untouched."
+    migration = migrated["data_migrations"][main.WORKSTREAM_EVIDENCE_PRESETS_VERSION]
+    assert migration["count"] == 4
+
+    second_read = main._read_workstream_payload()
+    assert second_read["data_migrations"][main.WORKSTREAM_EVIDENCE_PRESETS_VERSION]["count"] == 4
+
+
+def test_all_neutral_evidence_packs_are_available_and_have_sources_only():
+    expected = {
+        "SREE SIDDAGANGA MATH": "sree_siddaganga_math",
+        "SRI VISHWESHA DHAMA GURUKULAM": "sri_vishwesha_dhama_gurukulam",
+        "TADIMETY RADHAKRISHNA CHARITABLE TRUST": "tadimety_radhakrishna_charitable_trust",
+        "Sri Ananddhanamma Charitable Trust and Seva Foundation": "sri_ananddhanamma_trust",
+        "Sri Sathya Sai Premaarpitham Foundation": "sri_sathya_sai_premaarpitham_foundation",
+        "Sri Durga Foundation": "sri_durga_foundation",
+        "Ten Academy / Hub Foundation Charitable Trust": "ten_academy_hub_foundation",
+        "Don Bosco Child Labour Mission, Davangere": "don_bosco_child_labour_mission_davangere",
+        "Vikasam Seva Foundation": "vikasam_seva_foundation",
+        "Vision Life Foundation": "vision_life_foundation",
+        "Vivekananda Girijana Kalyana Kendra — VGKK": "vivekananda_girijana_kalyana_kendra",
+        "Vonisha Service Foundation": "vonisha_service_foundation",
+        "ABAN EDUCATION SOCIETY": "aban_education_society",
+        "AIKYA TRUST": "aikya_trust",
+        "Ananda Suvarna Rural Development Trust": "ananda_suvarna_rural_development_trust",
+        "BELAKOO": "belakoo_trust",
+        "CHERYSH TRUST": "cherysh_trust",
+        "Chethana Special School": "chethana_special_school",
+        "Eka Educational and Charitable Trust": "eka_educational_charitable_trust",
+        "HELPING HANDS TOGETHER": "helping_hands_together",
+        "Inchara Foundation": "inchara_foundation",
+        "Matoshree Ambubai Residential School": "matoshree_ambubai_residential_school",
+        "PRACHODANA NGO - Open Shelter Programme": "prachodana_open_shelter",
+        "Rebuild India Foundation": "rebuild_india_foundation",
+        "SAMARPAN": "samarpan_foundation",
+    }
+    assert len(main.WORKSTREAM_EVIDENCE_PRESETS) == 25
+    for ngo_name, expected_id in expected.items():
+        preset_id, preset = main._workstream_find_evidence_preset(ngo_name)
+        assert preset_id == expected_id
+        assert preset is not None
+        for metric_key in main.WORKSTREAM_METRIC_KEYS:
+            raw_row = preset["metric_evidence"][metric_key]
+            assert set(raw_row) == {"text", "links"}
+            assert raw_row["text"].strip()
+            assert raw_row["links"]
+            assert all(link.get("url", "").startswith(("http://", "https://")) for link in raw_row["links"])
+

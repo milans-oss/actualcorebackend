@@ -5595,6 +5595,14 @@ DEFAULT_TANISHQ_TASKS = [
     {"ngo_name": "Referral NGO 3", "website": "", "background": "Capture NGO details, POC contact number, and referral source."},
 ]
 
+_BACKEND_MODULE_DIR = str(Path(__file__).resolve().parent)
+if _BACKEND_MODULE_DIR not in sys.path:
+    sys.path.insert(0, _BACKEND_MODULE_DIR)
+from workstream_evidence_presets import (
+    WORKSTREAM_EVIDENCE_PRESETS,
+    WORKSTREAM_EVIDENCE_PRESETS_VERSION,
+)
+
 def _clean_workstream_metric_scores(value):
     raw = value if isinstance(value, dict) else {}
     out = {}
@@ -5663,6 +5671,112 @@ def _clean_workstream_metric_evidence(value):
 
 
 
+
+
+def _workstream_preset_name_key(value: str) -> str:
+    return re.sub(r"[^a-z0-9]+", " ", str(value or "").lower()).strip()
+
+
+def _merge_workstream_evidence_text(preset_text: str, existing_text: str) -> str:
+    """Put the reviewed preset first while retaining any earlier admin-added facts."""
+    lines = []
+    seen = set()
+    for raw in [preset_text, existing_text]:
+        for line in str(raw or "").splitlines():
+            clean = line.strip()
+            key = re.sub(r"\s+", " ", clean).lower()
+            if not clean or key in seen:
+                continue
+            seen.add(key)
+            lines.append(clean)
+    return "\n".join(lines)[:8000]
+
+
+def _merge_workstream_evidence_links(preset_links, existing_links) -> list[dict]:
+    links = []
+    seen_urls = set()
+    for link in list(preset_links or []) + list(existing_links or []):
+        if not isinstance(link, dict):
+            continue
+        url = str(link.get("url") or "").strip()
+        if not url or url in seen_urls:
+            continue
+        seen_urls.add(url)
+        links.append({"label": str(link.get("label") or f"Source {len(links) + 1}")[:160], "url": url[:1200]})
+        if len(links) >= 20:
+            break
+    return links
+
+
+def _workstream_find_evidence_preset(ngo_name: str):
+    key = _workstream_preset_name_key(ngo_name)
+    if not key:
+        return "", None
+    for preset_id, preset in WORKSTREAM_EVIDENCE_PRESETS.items():
+        aliases = {_workstream_preset_name_key(alias) for alias in (preset.get("aliases") or set())}
+        for alias in aliases:
+            if not alias:
+                continue
+            if key == alias or (len(alias) >= 8 and key.startswith(alias + " ")):
+                return preset_id, preset
+    return "", None
+
+
+def _apply_workstream_evidence_presets(data: dict) -> tuple[bool, list[dict]]:
+    """Versioned migration for evidence packs already assigned in persistent PM data.
+
+    The Railway volume is intentionally not bundled in releases. Applying the
+    preset while reading workstream_data.json ensures existing assignments are
+    updated after deployment without deleting responses or earlier admin notes.
+    """
+    changed = False
+    applied = []
+    pms = data.get("pms") if isinstance(data.get("pms"), dict) else {}
+    for pm_name, pm in pms.items():
+        tasks = pm.get("tasks") if isinstance(pm, dict) and isinstance(pm.get("tasks"), list) else []
+        for task_index, task in enumerate(tasks):
+            if not isinstance(task, dict):
+                continue
+            preset_id, preset = _workstream_find_evidence_preset(task.get("ngo_name") or task.get("name") or "")
+            if not preset or task.get("metric_evidence_preset_version") == WORKSTREAM_EVIDENCE_PRESETS_VERSION:
+                continue
+            existing = _clean_workstream_metric_evidence(task.get("metric_evidence"))
+            reviewed = _clean_workstream_metric_evidence(preset.get("metric_evidence"))
+            prior_preset_version = str(task.get("metric_evidence_preset_version") or "")
+            replace_v65_generated_pack = prior_preset_version.startswith("v65-three-ngo-evidence")
+            merged = {}
+            for metric_key in WORKSTREAM_METRIC_KEYS:
+                old_row = existing.get(metric_key) or {}
+                new_row = reviewed.get(metric_key) or {}
+                if replace_v65_generated_pack:
+                    merged_text = str(new_row.get("text") or "")[:8000]
+                    merged_links = _merge_workstream_evidence_links(new_row.get("links"), [])
+                else:
+                    merged_text = _merge_workstream_evidence_text(new_row.get("text", ""), old_row.get("text", ""))
+                    merged_links = _merge_workstream_evidence_links(new_row.get("links"), old_row.get("links"))
+                merged[metric_key] = {
+                    "text": merged_text,
+                    "links": merged_links,
+                    # Evidence packs must not pre-fill or constrain the PM's rating.
+                    # Clear any v65 preset ceilings while preserving the separate PM response.
+                    "ceiling_rank": 0,
+                    "ceiling_reason": "",
+                }
+            task["metric_evidence"] = merged
+            task["metric_evidence_preset_id"] = preset_id
+            task["metric_evidence_preset_version"] = WORKSTREAM_EVIDENCE_PRESETS_VERSION
+            task["metric_evidence_reviewed_on"] = "2026-07-17"
+            changed = True
+            applied.append({"pm": str(pm_name), "task_index": task_index, "ngo_name": str(task.get("ngo_name") or ""), "preset_id": preset_id})
+    if changed:
+        migrations = data.setdefault("data_migrations", {})
+        migrations[WORKSTREAM_EVIDENCE_PRESETS_VERSION] = {
+            "applied_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+            "count": len(applied),
+            "items": applied[:100],
+        }
+    return changed, applied
+
 def _default_workstream_payload():
     now = int(time.time())
     pms = {}
@@ -5716,6 +5830,9 @@ def _read_workstream_payload():
             cur["tasks"] = default_pm["tasks"]
         if not isinstance(cur.get("responses"), dict):
             cur["responses"] = {}
+    evidence_changed, _ = _apply_workstream_evidence_presets(data)
+    if evidence_changed:
+        _atomic_write_text(WORKSTREAM_DATA_FILE, json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
     return data
 
 
