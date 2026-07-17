@@ -338,7 +338,7 @@ def test_all_neutral_evidence_packs_are_available_and_have_sources_only():
         "SUKANKSHA CHARITABLE TRUST": "sukanksha_charitable_trust",
         "SWAPAKSH LEARNING FOUNDATION": "swapaksh_learning_foundation",
     }
-    assert len(main.WORKSTREAM_EVIDENCE_PRESETS) == 60
+    assert len(main.WORKSTREAM_EVIDENCE_PRESETS) == 74
     for ngo_name, expected_id in expected.items():
         preset_id, preset = main._workstream_find_evidence_preset(ngo_name)
         assert preset_id == expected_id

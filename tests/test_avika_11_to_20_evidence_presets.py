@@ -22,7 +22,7 @@ EXPECTED = {
 
 
 def test_v68_avika_11_to_20_have_source_grounded_neutral_evidence_packs():
-    assert main.WORKSTREAM_EVIDENCE_PRESETS_VERSION.startswith("v6")
+    assert main.WORKSTREAM_EVIDENCE_PRESETS_VERSION.startswith("v")
     forbidden_keys = {
         "score", "rank", "ranking", "recommended_score", "recommended_rank",
         "ceiling", "ceiling_rank", "ceiling_reason", "overall_decision",

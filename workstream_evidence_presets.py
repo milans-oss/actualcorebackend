@@ -4,7 +4,7 @@ These presets deliberately contain evidence and source links only. They do not
 pre-populate a PM score, recommended score, ceiling, or ranking rationale.
 """
 
-WORKSTREAM_EVIDENCE_PRESETS_VERSION = "v69-piyush-10-to-24-evidence-packs-2026-07-17"
+WORKSTREAM_EVIDENCE_PRESETS_VERSION = "v70-rachit-12-to-24-avika-remaining-evidence-packs-2026-07-17"
 
 
 def _row(text, links):
@@ -1501,6 +1501,369 @@ WORKSTREAM_EVIDENCE_PRESETS = {
         _row(
             "The available source mentions resident guidance, values and holistic development, but it does not document a varied recurring set of sport, arts, competitions, public performance, child leadership, educational visits, civic projects, career exposure or external mentors. A residential campus and inspirational talks are not sufficient Development Environment evidence. Food, hostel provision and ordinary schooling are baseline supports and are not counted under this metric. No Gurukulam-specific official annual or impact-report PDF was located; Annapoorna's reports belong to the nutrition partner rather than this institution.",
             [{"label": "Official Annapoorna report on the Gurukulam", "url": "https://annapoorna.org.in/2025/09/20/supporting-rural-education-and-nutrition-annapoorna-trust-at-vivekananda-gurukulam/"}, {"label": "Annapoorna annual-report index - not a Gurukulam report", "url": "https://annapoorna.org.in/annual-reports/"}],
+        ),
+    ),
+
+
+    "satguna_sangraha_trust": _pack(
+        [
+            "satguna sangraha trust", "satguna sangraha", "sai gurukul school",
+            "sri sai gurukul school", "satguna sangraha educare",
+        ],
+        _row(
+            "The official website reports that Sai Gurukul began as a bridge school in 2006 for school dropouts, rag-picker children and other underserved children, and later became a Karnataka-government-recognised English-medium school serving more than 400 children from LKG through Class 10. For the fifth Class 10 batch in 2023–24, the Trust reports a 100% pass rate, with 12 distinctions and 11 first-class results. This is a specific school-completion result, but the site does not publish the total cohort size, earlier batch tables, PUC or college destinations, employment, or named alumni pathways. No official annual or substantive impact-report PDF was located; the result is a website-reported claim.",
+            [
+                {"label": "Official Satguna Sangraha About page", "url": "https://satgunasangraha.com/about-us/"},
+                {"label": "Official Educare page", "url": "https://satgunasangraha.com/educare/"},
+            ],
+        ),
+        _row(
+            "Sai Gurukul combines a bridge-school origin with a recognised formal pathway from LKG to Class 10. The Trust states that the school follows an English-medium curriculum, teaches Kannada and Hindi as additional languages, integrates Education in Human Values as a subject, and operates from 9:00 a.m. to 3:30 p.m. from Monday to Saturday. This establishes a sustained school model and a potential bridge-to-formal-education pathway, but the public pages do not describe baseline assessment, level grouping, remediation, teacher ratios, continuous assessment, board-examination preparation or transition support after Class 10. No official annual or substantive impact-report PDF was found.",
+            [
+                {"label": "Official Satguna Sangraha About page", "url": "https://satgunasangraha.com/about-us/"},
+                {"label": "Official Educare page", "url": "https://satgunasangraha.com/educare/"},
+            ],
+        ),
+        _row(
+            "The school states that yoga, sports and music are part of its extracurricular provision, but it does not publish their frequency, student participation, instructors, external competitions, performances, leadership roles or progression through these activities. The website also says the school currently rents a small parking area as a weekend playground and hopes to develop a larger facility. This is too limited to establish a varied Development Environment across the child cohort. Free education, meals, healthcare and infrastructure are baseline supports and are not counted under this metric. No official annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Official Satguna Sangraha About page", "url": "https://satgunasangraha.com/about-us/"},
+            ],
+        ),
+    ),
+
+    "malleshwaram_shishu_vihar": _pack(
+        [
+            "shishu vihar", "malleshwaram shishu vihar", "the malleshwaram shishu vihar",
+            "msv school", "msv malleshwaram",
+        ],
+        _row(
+            "The official history page says MSV's older alumni, now largely in their sixties and seventies, include scientists, chartered accountants, engineers, businesspeople and traders. This is a broad institutional alumni narrative rather than a documented programme cohort: names, years, destinations and the proportion of former students reaching these occupations are not published. The current website does not provide Class 10 results, college admissions, scholarship destinations or recent alumni outcomes. No NGO-specific annual or substantive impact-report PDF was located; external donor reports that mention MSV are not treated as the school's own outcome report.",
+            [
+                {"label": "Official MSV history page", "url": "https://malleshwaramshishuvihar.org/about-msv/"},
+                {"label": "Official MSV website", "url": "https://malleshwaramshishuvihar.org/"},
+            ],
+        ),
+        _row(
+            "MSV follows the Karnataka state syllabus and serves children from LKG through Class 10. Official pages describe audio-visual support in pre-primary classes, smart-board learning, regular checks on classwork and homework, science experiments, a year-wise computer syllabus and encouragement of English expression, independent thinking, responsibility and public speaking. These features indicate a continuing mainstream-school model with laboratory and digital-learning inputs. The website does not publish learner baselines, remedial grouping, teacher ratios, examination results or measured learning gains, and it describes fees as reasonable with scholarships for needy and meritorious students rather than establishing that the entire school is free. No official annual or substantive impact-report PDF was found.",
+            [
+                {"label": "Official School Life page", "url": "https://malleshwaramshishuvihar.org/school-life/"},
+                {"label": "Official Science Lab page", "url": "https://malleshwaramshishuvihar.org/science-lab/"},
+                {"label": "Official Computer Lab page", "url": "https://malleshwaramshishuvihar.org/computer-lab/"},
+            ],
+        ),
+        _row(
+            "MSV documents a varied set of opportunities beyond ordinary academics: annual field trips, educational visits, daily sport, yoga and Kalaripayattu, inter-school competitions, music instruction with further training for interested or talented students, public speaking, and student responsibility through class and school leadership. Dated event pages also record external visits such as the Raman Research Institute and a multi-location educational excursion. This is stronger than generic extracurricular language because it combines travel, sport, arts, competition, public expression and responsibility. The site does not provide participation rates or longitudinal progression for every child, so these activities should not be treated as universal outcomes. Meals and counselling are not counted under this metric. No official annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Official School Life page", "url": "https://malleshwaramshishuvihar.org/school-life/"},
+                {"label": "Official Sports, Games and Yoga page", "url": "https://malleshwaramshishuvihar.org/sports-games-yoga/"},
+                {"label": "Official Events page", "url": "https://malleshwaramshishuvihar.org/events-at-msv/"},
+            ],
+        ),
+    ),
+
+    "sneha_shikshana_samsthe_sullia": _pack(
+        [
+            "sneha shikshana samsthe sullia", "sneha shikshana samsthe", "sneha school sullia",
+            "sphurti skill development centre sullia", "sphurti vocational training centre sullia",
+        ],
+        _row(
+            "A Right To Live partner annual report for 2022–23 states that a pilot cohort of 15 students from low-income families at the jointly established Sphurti Skill Development Centre received training in Basic Computer Applications, Desktop Publishing and Tally, and that 73% obtained jobs as college computer teachers, Grameena Janaseva Kendra assistants, data-entry workers or billing staff. This is a concrete employment result for one small vocational cohort; it must not be attributed to all children attending Sneha's schools. No Sneha-owned annual or substantive impact-report PDF was located, and no school-level Class 10, college or repeated alumni-destination table was found.",
+            [
+                {"label": "Right To Live Annual Report 2022–23 — partner evidence", "url": "https://righttolive.org/docs/reports/Annual%20Report%202022-23.pdf"},
+                {"label": "Right To Live Annual Report 2023–24 — partner evidence", "url": "https://righttolive.org/docs/reports/Annual%20Report%202023-24.pdf"},
+            ],
+        ),
+        _row(
+            "The strongest documented learning evidence concerns the partner-supported vocational centre: a defined pilot curriculum in Basic Computer Applications, DTP and Tally linked to employment. The 2023–24 Right To Live report also records a Natkhat science laboratory at Sneha Shikshana Samsthe with equipment intended for hands-on science learning. These are useful programme components, but the public evidence does not establish class frequency, course hours, assessment, trainer qualifications, repeated cohorts or the broader school's pedagogy. The annual reports belong to Right To Live, not Sneha, so partner projects must not be presented as a complete description of Sneha's educational model.",
+            [
+                {"label": "Right To Live Annual Report 2022–23 — partner evidence", "url": "https://righttolive.org/docs/reports/Annual%20Report%202022-23.pdf"},
+                {"label": "Right To Live Annual Report 2023–24 — partner evidence", "url": "https://righttolive.org/docs/reports/Annual%20Report%202023-24.pdf"},
+            ],
+        ),
+        _row(
+            "The reviewed partner reports do not show a recurring, varied Development Environment for the same children. The science laboratory is principally part of the Learning Model, while career guidance and vocational placement support are transition preparation. No reliable evidence was found of sustained student leadership, public exhibitions, arts or sports progression, educational travel, community projects or long-term external mentoring attributable to a defined Sneha child cohort. Equipment, infrastructure and employment training should not be double-counted as Development Environment evidence. No Sneha-owned annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Right To Live Annual Report 2023–24 — partner evidence", "url": "https://righttolive.org/docs/reports/Annual%20Report%202023-24.pdf"},
+            ],
+        ),
+    ),
+
+    "sri_kunchitigara_mahasamsthana_mattada_charitable_trust": _pack(
+        [
+            "sri kunchitigara mahasamsthana mattada charitable trust r",
+            "sri kunchitigara mahasamsthana mattada charitable trust",
+            "sri kunchitigara maha samstana matta", "kunchitigara matta", "kunchitigara matha",
+        ],
+        _row(
+            "The official website lists education institutions and religious-learning facilities, but it does not publish child-level progression evidence. No Class 10 or PUC results, formal-school transitions, scholarships, college destinations, vocational completions, employment outcomes or named alumni were found. A Karnataka Samskrit University annual report records that a teacher refresher camp was hosted at the Matha, but that is not a student outcome or the Trust's annual report. No official Trust annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Official Sri Kunchitigara Matha website", "url": "https://www.kunchitigamatta.org/"},
+                {"label": "Karnataka Samskrit University Annual Report 2023–24 — external institutional reference", "url": "https://ksu.ac.in/wp-content/uploads/2024/8p/23-24e.pdf"},
+            ],
+        ),
+        _row(
+            "The official site lists Sadvidya Sanskrit Pathashala, Sri Lakshminarasimha Veda Pathashala, a residential/student hostel, two high schools, a PU college, Veda–Agama instruction, Sanskrit activity and seasonal samskara camps. This confirms the presence of educational institutions and traditional-learning programmes, but the site does not state student numbers, grades served at each institution, fee or access policy, curriculum, class frequency, assessment, teacher ratios, remedial learning or transitions between the school, PU and other pathways. Food and hostel provision are access supports, not evidence of pedagogy. No official annual or substantive impact-report PDF was found.",
+            [
+                {"label": "Official Sri Kunchitigara Matha website", "url": "https://www.kunchitigamatta.org/"},
+            ],
+        ),
+        _row(
+            "The website mentions Veda–Agama camps, Sanskrit festivals, yoga observances, free summer samskara camps, tree planting and temple-cleaning activities. These are potentially cultural and community opportunities, but the public material does not identify the participating child cohort, frequency, duration, leadership roles, public outputs or progression through arts, sport or civic responsibility. Annual or seasonal religious events should not be treated as a varied Development Environment for every hostel or school student. Food, residence and healthcare are not counted here. No official annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Official Sri Kunchitigara Matha website", "url": "https://www.kunchitigamatta.org/"},
+            ],
+        ),
+    ),
+
+    "sri_sathya_sai_loka_seva_educational_institutions_muddenahalli": _pack(
+        [
+            "sri sathya sai loka seva educational institutions ssslst muddenahalli campus",
+            "sri sathya sai loka seva educational institutions muddenahalli campus",
+            "sri sathya sai loka seva trust muddenahalli", "ssslst muddenahalli",
+            "sathya sai grama muddenahalli",
+        ],
+        _row(
+            "The official performance page gives detailed High School and CBSE examination tables across many years, with school-level pass rates commonly above 90%. However, the published tables stop at 2008–09, so they demonstrate historical academic performance rather than current outcomes. The site also says alumni support surrounding-village development, but it does not publish recent Class 10 or PUC results, college destinations, professional outcomes or named alumni pathways. No current official annual or substantive impact-report PDF was located; the reviewed website is marked copyright 2021 and contains visibly historical data.",
+            [
+                {"label": "Official Performance page", "url": "https://ssslst.org/perf.html"},
+                {"label": "Official About page", "url": "https://ssslst.org/aboutus.html"},
+            ],
+        ),
+        _row(
+            "The Muddenahalli campus operates Karnataka-state-board and CBSE schools and a PU college with science and commerce streams. Official pages describe Kannada and English media, formal subject structures, four libraries, computer and science laboratories, individual experimentation, multimedia teaching, student presentations and guest lectures. Teachers and dedicated residential staff live with students, and education is stated to be free. This is a substantial formal learning system, but the site does not provide current assessment data, remedial systems, child-level learning gains or transition support beyond the curriculum. No current official annual or substantive impact-report PDF was found, and several pages contain outdated figures.",
+            [
+                {"label": "Official Curriculum page", "url": "https://ssslst.org/currculm.html"},
+                {"label": "Official Facilities page", "url": "https://ssslst.org/facility.html"},
+                {"label": "Official About page", "url": "https://ssslst.org/aboutus.html"},
+            ],
+        ),
+        _row(
+            "The official facilities page documents a genuinely varied institutional environment: organised basketball, badminton, volleyball, table tennis, kho-kho, kabaddi, football, cricket, athletics and free karate; district- and state-level participation; classical instruments, Bharatanatyam and Carnatic music taught by professionals; weekly yoga with competitions and stage performance; student presentations, guest lectures, service activities and moral examinations with medals. These are recurring sport, arts, public-performance, exposure and responsibility opportunities rather than baseline care. The material is old and does not establish current participation rates, so present operation should be validated. Hostel, food and healthcare are not counted under this metric. No current annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Official Facilities page", "url": "https://ssslst.org/facility.html"},
+            ],
+        ),
+    ),
+
+    "srivali_trust": _pack(
+        ["srivali trust", "srivali high school", "srivali school", "shrivali trust", "shrivali high school"],
+        _row(
+            "The official Annual Report 2022–23 records that 99 students appeared for the SSLC examination, 98 passed, and the school achieved a 98.98% pass rate, with 24 distinctions and 66 first-class results. It also provides a ten-year table showing school pass rates consistently above 90%. This is strong repeated school-completion evidence, but the report does not track graduates into PUC, college, vocational training or employment. The 2022–23 report is the latest substantive official report located in this research, so the evidence should not be presented as a current 2026 result.",
+            [
+                {"label": "Official Annual Report 2022–23", "url": "https://srivalihighschool.in/wp-content/uploads/sites/14/2023/06/Srivali-High-School-Annual-Report-2022-23.pdf"},
+                {"label": "Official Srivali High School website", "url": "https://srivalihighschool.in/"},
+            ],
+        ),
+        _row(
+            "Srivali operates a free secondary school serving Classes 8–10 and prepares students for the Karnataka SSLC examination. The annual report documents formal examinations, preparatory and preliminary examinations, parent–teacher meetings, computer and science activity, school-level science-model work and teacher observation of SSLC preparation. These elements show a structured mainstream secondary-school pathway. The report does not explain baseline assessment, remedial grouping, individualised teaching, teacher–student ratios or measured learning gains beyond board results. The source is the official 2022–23 annual report, not a current-year report.",
+            [
+                {"label": "Official Annual Report 2022–23", "url": "https://srivalihighschool.in/wp-content/uploads/sites/14/2023/06/Srivali-High-School-Annual-Report-2022-23.pdf"},
+            ],
+        ),
+        _row(
+            "The 2022–23 report documents varied and externally visible opportunities: science-model exhibitions, school art displays, debate, speech, drawing, quiz, singing and folk-performance competitions, yoga, chess, athletics and other sports at zonal, taluka, district and state levels. It names student placements and records progression to higher-level competitions, including state-level sports participation. This establishes public presentation, creative expression and competitive sport beyond ordinary instruction. Participation was activity-specific and should not be attributed to every student. Free books, uniforms, meals and healthcare activities are baseline supports and are not counted here. The evidence is dated 2022–23.",
+            [
+                {"label": "Official Annual Report 2022–23", "url": "https://srivalihighschool.in/wp-content/uploads/sites/14/2023/06/Srivali-High-School-Annual-Report-2022-23.pdf"},
+            ],
+        ),
+    ),
+
+    "standup_india_foundation": _pack(
+        ["standup india foundation", "stand up india foundation", "standup india ngo", "sif foundation"],
+        _row(
+            "The official education page reports that more than 103 children received scholarships to continue their studies, while a named story describes Mamatha avoiding dropout and continuing education with an aspiration to study science and biotechnology. These are continuation signals, not completed destinations. The website does not publish Class 10 or 12 completion, college entry, course completion, employment or a denominator for scholarship recipients. An Annual Report 2022–23 is listed on the official site, but its download is form-gated and the PDF could not be directly reviewed; this pack therefore relies on official web pages and does not claim report-backed outcomes.",
+            [
+                {"label": "Official Education page", "url": "https://www.standupindia.org.in/education/"},
+                {"label": "Official Stories of Change", "url": "https://www.standupindia.org.in/stories-of-change/"},
+                {"label": "Official Annual Report page", "url": "https://www.standupindia.org.in/annual-report/"},
+            ],
+        ),
+        _row(
+            "StandUp India Foundation's education work is publicly described through scholarships, school-infrastructure support, career guidance and counselling, social-entrepreneurship training, vocational training and school-supply distribution. These are useful access and transition supports, but the site does not show a direct teaching centre or school curriculum, instructional frequency, learner grouping, assessment, mentoring duration or learning gains. The youth-skilling figures should not automatically be assigned to school-age scholarship children. The listed 2022–23 annual report could not be directly reviewed because access is form-gated.",
+            [
+                {"label": "Official Education page", "url": "https://www.standupindia.org.in/education/"},
+                {"label": "Official Annual Report page", "url": "https://www.standupindia.org.in/annual-report/"},
+            ],
+        ),
+        _row(
+            "The reviewed official pages do not demonstrate a recurring, varied Development Environment around the same child cohort. Career guidance and social-entrepreneurship or vocational training are principally learning and transition interventions. Corporate volunteering, school infrastructure and supply distribution do not by themselves establish child leadership, arts or sports progression, public performance, educational travel, community projects or sustained external mentoring. No such opportunity pathway was found in the accessible evidence. Scholarships, material support and counselling are not counted under this metric. The listed 2022–23 annual report was not directly accessible for review.",
+            [
+                {"label": "Official Education page", "url": "https://www.standupindia.org.in/education/"},
+                {"label": "Official Stories of Change", "url": "https://www.standupindia.org.in/stories-of-change/"},
+            ],
+        ),
+    ),
+
+    "maqbooliya_memorial_educational_welfare_charitable_trust": _pack(
+        [
+            "the maqbooliya memorial educational welfare charitable trust",
+            "maqbooliya memorial educational welfare charitable trust", "maqbooliya trust",
+            "the maqbooliya",
+        ],
+        _row(
+            "The official website states that the organisation serves underprivileged people and is located at the Al-Ameen Group of Schools in Hangal, but it does not publish any child-progression evidence. No named students, school completion, examination results, scholarships, college destinations, vocational completions, employment outcomes or alumni stories were found. No official annual or substantive impact-report PDF was located. Legal identity, location and broad educational intent should not be converted into achieved outcomes.",
+            [
+                {"label": "Official Maqbooliya website", "url": "https://www.themaqbooliya.org/"},
+            ],
+        ),
+        _row(
+            "The site says that it provides a 'training and development program to every student', but it does not identify the operating institution, current student cohort, grades, teachers, curriculum, timetable, class frequency, assessment, remedial instruction or course duration. The address within the Al-Ameen Group of Schools does not establish whether the Trust itself operates those schools or delivers a separate programme there. The learning claim therefore remains generic and unsubstantiated. No official annual or substantive impact-report PDF was found.",
+            [
+                {"label": "Official Maqbooliya website", "url": "https://www.themaqbooliya.org/"},
+            ],
+        ),
+        _row(
+            "No defined child cohort is shown receiving recurring arts, sport, clubs, leadership, public performance, educational visits, external mentoring or community projects. The website contains only broad educational and welfare language and a gallery/future-plans structure without programme detail. Generic personality-development language is not sufficient Development Environment evidence. Health, charity and material support would not be counted here unless linked to demonstrated developmental opportunities. No official annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Official Maqbooliya website", "url": "https://www.themaqbooliya.org/"},
+            ],
+        ),
+    ),
+
+    "upkriti_ngo": _pack(
+        ["upkriti ngo", "upkriti organization", "upkriti", "upkriti foundation"],
+        _row(
+            "Upkriti's official activities page records child-related events and material support, including a summer camp, stationery distribution, school-beautification work and a large Pulse Polio drive. These measure activity or reach rather than progression. No return-to-school cases, Class 10 or 12 completion, scholarship destinations, vocational completion, employment or named former participants were found. No official annual or substantive impact-report PDF was located. The claim of working on education for poor and rural children is not accompanied by an outcome cohort.",
+            [
+                {"label": "Official Upkriti activities page", "url": "https://upkriti.org/activities.html"},
+                {"label": "Official Upkriti website", "url": "https://upkriti.org/"},
+            ],
+        ),
+        _row(
+            "The public evidence consists mainly of one-off activities: volunteers ran games during a summer-camp session, distributed stationery, supported an event for blind children and painted government-school walls with educational and child-rights themes. The site does not identify an ongoing learning centre, curriculum, repeated class schedule, teachers, assessment, learner grouping or demonstrated learning gains. School beautification and stationery are inputs rather than a Learning Model. No official annual or substantive impact-report PDF was found.",
+            [
+                {"label": "Official Upkriti activities page", "url": "https://upkriti.org/activities.html"},
+            ],
+        ),
+        _row(
+            "The summer-camp games, recreation activities, tree planting and event support for blind children provide isolated exposure or creative activity, but the site does not establish frequency, a consistent child cohort, public outputs, leadership roles, competition progression, educational travel or sustained mentoring. These one-off events should not be assembled into a comprehensive Development Environment. Government-school beautification, stationery, groceries and health campaigns are not counted under this metric. No official annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Official Upkriti activities page", "url": "https://upkriti.org/activities.html"},
+            ],
+        ),
+    ),
+
+    "vishvakannada_foundation": _pack(
+        ["vishvakannada foundation", "vishva kannada foundation", "vishvakannada", "vishvakannada programming"],
+        _row(
+            "The official pages describe intended programme outcomes such as children independently creating animated stories, games and interactive projects, but they do not publish completion counts, school results, external certifications, continued study, employment or named alumni destinations. The activities page lists workshops at multiple Karnataka locations without a cohort-level progression table. Project creation is a current learning output rather than an alumni destination. No official annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Official Scratch Programming page", "url": "https://foundation.vishvakannada.com/scratch-programming/"},
+                {"label": "Official Activities and Events page", "url": "https://foundation.vishvakannada.com/activities-and-events/"},
+            ],
+        ),
+        _row(
+            "Vishvakannada presents a differentiated programming model for Kannada-medium learners. Its Scratch programme for Classes 1–5 uses Kannada visual blocks, culturally familiar stories and folk scenarios to teach sequences, loops, conditionals, logical decomposition, game design and interactive storytelling. The wider programme menu includes LOGO, Python in Kannada and teacher-capacity building. This is a clear language-access and project-based design, but the website does not publish class frequency, total instructional hours, mentor ratios, learner assessment, implementation scale or independently demonstrated learning gains. No official annual or substantive impact-report PDF was found.",
+            [
+                {"label": "Official Scratch Programming page", "url": "https://foundation.vishvakannada.com/scratch-programming/"},
+                {"label": "Official Programmes page", "url": "https://foundation.vishvakannada.com/python-in-kannada/"},
+            ],
+        ),
+        _row(
+            "Children are expected to create stories, animations and games rooted in local culture, which supports creative expression and creator identity. However, these outputs are central to the Learning Model and should not be double-counted as a wider Development Environment without evidence of public exhibitions, competitions, peer leadership, external mentors, educational visits or community projects. The activities page does not provide enough detail to establish a recurring varied opportunity pathway for the same learners. Hardware, certificates and workshop access are not sufficient by themselves. No official annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Official Scratch Programming page", "url": "https://foundation.vishvakannada.com/scratch-programming/"},
+                {"label": "Official Activities and Events page", "url": "https://foundation.vishvakannada.com/activities-and-events/"},
+            ],
+        ),
+    ),
+
+    "trust_for_rural_upliftment_strategies": _pack(
+        [
+            "trust for rural upliftment strategies trust", "trust for rural upliftment strategies",
+            "trust rural upliftment strategies", "trust india child labour school", "trust india",
+        ],
+        _row(
+            "The official activities page reports that TRUST enrolled 95 out-of-school, street-connected or working children into mainstream government schools over the 'last few academic years'. This is a valid return-to-formal-education outcome, but the page does not provide dates, a cohort denominator, school-retention data, grade progression or later completion. It also describes historical residential rehabilitation schools for girl child labourers, but no completion or post-programme destinations are published. No official annual or substantive impact-report PDF was located; the website uses undated and partly past-tense language, so current operation needs verification.",
+            [
+                {"label": "Official TRUST activities page", "url": "https://trustindia.org/activities/"},
+                {"label": "Official TRUST website", "url": "https://trustindia.org/"},
+            ],
+        ),
+        _row(
+            "TRUST describes six non-residential schools serving 250 children aged 6–14 who were out of school, on the street or engaged in child labour, supported through SSA and NCLP. It also reports primary education and vocational training in residential rehabilitation schools and skill courses in bookbinding, tailoring and fashion design for street-connected and marginalised students. This suggests a bridge, mainstreaming and vocational pathway. The public page does not specify curriculum, daily timetable, baseline assessment, level grouping, transition protocol, teacher numbers or current programme status. No official annual or substantive impact-report PDF was found.",
+            [
+                {"label": "Official TRUST activities page", "url": "https://trustindia.org/activities/"},
+            ],
+        ),
+        _row(
+            "The official page mentions yoga classes, cultural events, child-rights campaigns, environmental awareness and education campaigns. It does not show how often these occurred, which children participated, whether children held leadership roles, or whether there were public performances, competitions, sustained clubs, external mentors or educational visits. These broad and partly historical activities are insufficient to establish a varied recurring Development Environment. Residential care and three daily meals are baseline supports and are not counted here. No official annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Official TRUST activities page", "url": "https://trustindia.org/activities/"},
+            ],
+        ),
+    ),
+
+    "vimukti_trust": _pack(
+        ["vimukti trust", "vimukti charitable trust", "vct vimukti", "capuchin vimukti", "vimukti pothnal"],
+        _row(
+            "Vimukti Charitable Trust's official Annual Report 2016–17 states that 472 children who were school dropouts or at risk were rescued from disadvantage, re-enrolled in school and supported with supplementary education. The report also documents daily evening tuition for 970 children in Classes 1–10 and residential support for 68 poor, orphaned or semi-orphaned children, but these are reach figures rather than later destinations. No Class 10 completion, college entry or employment outcomes for these child cohorts are given. The report is substantive but almost a decade old; no newer official annual report was located, so current delivery and retention must be validated.",
+            [
+                {"label": "Official Annual Report 2016–17", "url": "https://capuchinvimukti.com/annual_reports/ar2016-17.pdf"},
+                {"label": "Official Vimukti website", "url": "https://capuchinvimukti.com/"},
+            ],
+        ),
+        _row(
+            "The 2016–17 report describes everyday evening tuition except Sundays for 970 school-going children, delivered by 17 para-teachers, and supplementary education intended to prevent re-enrolled children from dropping out again. It also records a boarding programme for 68 children studying in three schools and an interactive Kannada science-and-mathematics audio resource for SSLC learners. This is a recurring remedial and retention model, but the report does not publish assessments, learning gains, grade progression or current programme figures. The report is dated 2016–17 and no newer official annual report was found.",
+            [
+                {"label": "Official Annual Report 2016–17", "url": "https://capuchinvimukti.com/annual_reports/ar2016-17.pdf"},
+            ],
+        ),
+        _row(
+            "The 2016–17 report documents unusually varied child agency and exposure: children’s clubs meeting every fifteen days, children’s parliaments raising school and rights issues with panchayat officials, Balika Sanghas, public rallies and street-facing advocacy, summer personality-development camps, a children’s festival with dance and music, art-and-craft workshops and environmental action. These are leadership, civic participation, public expression, arts and community responsibility rather than generic extracurricular claims. The report keeps some programme cohorts distinct, and current operation cannot be assumed because the evidence is from 2016–17. Food, boarding and healthcare are not counted under this metric.",
+            [
+                {"label": "Official Annual Report 2016–17", "url": "https://capuchinvimukti.com/annual_reports/ar2016-17.pdf"},
+            ],
+        ),
+    ),
+
+    "vishvakshema_trust": _pack(
+        ["vishvakshema trust", "vishva kshema trust", "shree parashara gurukulam", "parashara gurukulam"],
+        _row(
+            "The official Gurukulam page says that modern-education students may study through Class 10 under NIOS and may receive sponsorship through postgraduate or doctoral study based on academic excellence and conduct. This describes a promised pathway rather than achieved outcomes. The site does not publish NIOS results, numbers sponsored beyond Class 10, college destinations, degree completion, employment or named alumni. No official annual or substantive impact-report PDF was located. The postgraduate and doctoral sponsorship statement should not be presented as evidence that students have already reached those destinations.",
+            [
+                {"label": "Official Shree Parashara Gurukulam page", "url": "https://vishvakshema.org/gurukulam/"},
+                {"label": "Official Vishvakshema Trust website", "url": "https://vishvakshema.org/"},
+            ],
+        ),
+        _row(
+            "Shree Parashara Gurukulam, established in 2003, combines Vedas, Upanishads, Sanskrit and other traditional knowledge with English, Mathematics, Science and Computers. Children entering at Class 5 are selected through an entrance test and interview and can choose a nine-year Vedic route or a modern-education route through Class 10 under NIOS, while also studying music, yoga and traditional texts. This is a clearly structured dual pathway, but the website does not publish enrolment, daily schedule, teacher ratios, assessment, NIOS performance, learner support or progression between stages. No official annual or substantive impact-report PDF was found.",
+            [
+                {"label": "Official Shree Parashara Gurukulam page", "url": "https://vishvakshema.org/gurukulam/"},
+            ],
+        ),
+        _row(
+            "The Gurukulam states that students receive art, yoga, meditation and music alongside traditional and modern education. However, it does not provide frequency, specialist instructors, student participation, public performances, competitions, educational visits, leadership roles, mentoring or community-project evidence. These stated subjects therefore indicate potential enrichment but do not establish a varied demonstrated Development Environment. Free boarding, lodging, books, clothing and basic needs are access provisions and are not counted here. No official annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Official Shree Parashara Gurukulam page", "url": "https://vishvakshema.org/gurukulam/"},
+            ],
+        ),
+    ),
+
+    "vyakti_vikas_kendra_india": _pack(
+        [
+            "vyakti vikas kendra india", "vyakti vikas kendra", "vvki", "art of living free schools",
+            "art of living free tribal schools",
+        ],
+        _row(
+            "VVKI's official free-education page gives one named post-school pathway: Babita Patar, identified as a 2013 graduate of a Sri Sri Vidya Mandir school in Jharkhand, later became a teacher at another school in the same network. It also names an ex-student without a destination. The page does not publish repeated Class 10 or 12 completion, college admission, degree or employment tables. Crucially, the named outcomes and national reach figures are not Karnataka-specific and must not be attributed to an assigned Karnataka centre. No VVKI-specific official annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Official VVKI Free Education page", "url": "https://vvki.artofliving.org/free-education.php"},
+                {"label": "Official VVKI website", "url": "https://vvki.artofliving.org/"},
+            ],
+        ),
+        _row(
+            "VVKI describes a national free-school strategy for first-generation learners built on community mobilisation, locally selected and trained teachers, formal and value-based education, life skills, meditation and efforts to reduce dropout. The official page reports 1,356 free schools across 22 states, but displays internally inconsistent student and smart-classroom figures and does not separate Karnataka delivery. It does not publish curriculum by grade, teacher ratios, assessment, learning gains or school-completion data. The model is coherent at network level, but Karnataka-specific implementation must be verified. No VVKI-specific official annual or substantive impact-report PDF was found.",
+            [
+                {"label": "Official VVKI Free Education page", "url": "https://vvki.artofliving.org/free-education.php"},
+            ],
+        ),
+        _row(
+            "The network describes yoga, meditation, sport, dance, music, drawing and painting, and a named Jharkhand student reports computer skills, robot programming, football and archery. This indicates potentially varied arts, sport and technology exposure, but it is national network evidence from a named non-Karnataka school, not proof that every VVKI or Karnataka learner receives the same opportunities. The page does not show recurring student leadership, public platforms, competition progression, educational travel or community projects by centre. Meals, uniforms, transport and school supplies are not counted under this metric. No VVKI-specific annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Official VVKI Free Education page", "url": "https://vvki.artofliving.org/free-education.php"},
+            ],
         ),
     ),
 
