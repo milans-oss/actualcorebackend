@@ -4,7 +4,7 @@ These presets deliberately contain evidence and source links only. They do not
 pre-populate a PM score, recommended score, ceiling, or ranking rationale.
 """
 
-WORKSTREAM_EVIDENCE_PRESETS_VERSION = "v70-rachit-12-to-24-avika-remaining-evidence-packs-2026-07-17"
+WORKSTREAM_EVIDENCE_PRESETS_VERSION = "v73-ipshita-complete-evidence-packs-2026-07-17"
 
 
 def _row(text, links):
@@ -167,7 +167,7 @@ WORKSTREAM_EVIDENCE_PRESETS = {
     ),
 
     "sri_durga_foundation": _pack(
-        ["sri durga foundation", "sree durga foundation", "durga foundation"],
+        ["sri durga foundation", "sridurga foundation", "sree durga foundation", "durga foundation"],
         _row(
             "The Foundation reports that nearly 1,500 school and college students have received soft-skills training. This measures participation, not education or employment progression.\nNo school-completion, college-admission, job-placement, entrepreneurship, named former-participant or before-and-after destination evidence was found.\nThe phrases 'campus to corporate' and 'job interview preparation' describe programme content, not achieved employment.\nThe Impact page refers to annual reports and case studies, but no accessible substantive report or completed case study was available; impact counters also rendered without usable numbers.",
             [
@@ -219,6 +219,7 @@ WORKSTREAM_EVIDENCE_PRESETS = {
     "don_bosco_child_labour_mission_davangere": _pack(
         [
             "don bosco child labour mission", "don bosco child labour mission davangere",
+            "the don bosco charitable society", "don bosco charitable society",
             "dbclm", "dbclm davangere", "don bosco davangere",
         ],
         _row(
@@ -1863,6 +1864,1297 @@ WORKSTREAM_EVIDENCE_PRESETS = {
             "The network describes yoga, meditation, sport, dance, music, drawing and painting, and a named Jharkhand student reports computer skills, robot programming, football and archery. This indicates potentially varied arts, sport and technology exposure, but it is national network evidence from a named non-Karnataka school, not proof that every VVKI or Karnataka learner receives the same opportunities. The page does not show recurring student leadership, public platforms, competition progression, educational travel or community projects by centre. Meals, uniforms, transport and school supplies are not counted under this metric. No VVKI-specific annual or substantive impact-report PDF was located.",
             [
                 {"label": "Official VVKI Free Education page", "url": "https://vvki.artofliving.org/free-education.php"},
+            ],
+        ),
+    ),
+
+
+    "hsk_helping_hand_foundation": _pack(
+        [
+            "hsk helping hand foundation", "hsk helping hands foundation",
+            "hsk helping hand", "hsk foundation",
+        ],
+        _row(
+            "The official website says HSK supports education for children from low-income families and broadly claims that students have been educated, but it gives no count, reporting period, beneficiary definition or method. No named student, return-to-school case, Class 10 or 12 result, college destination, course completion or employment outcome is published. The stated plan to establish learning centres is a future goal, not an achieved child outcome. No official annual or substantive impact-report PDF was located; this evidence is based on the current official website and must be treated as organisation-reported.",
+            [
+                {"label": "Official HSK website", "url": "https://hskhelpinghandfoundation.com/"},
+            ],
+        ),
+        _row(
+            "HSK describes an Education Support Program involving scholarships, mentorship and digital education. The website does not identify a current learning centre, student cohort, teachers, class frequency, curriculum, level grouping, assessment, learning gains or transition process. Mentorship and digital education are therefore programme descriptions rather than a demonstrated recurring instructional model. The website separately describes establishing learning centres as a future goal. No official annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Official HSK website", "url": "https://hskhelpinghandfoundation.com/"},
+            ],
+        ),
+        _row(
+            "The official site mentions mentoring, awareness campaigns, field activities and volunteer engagement, but it does not show a defined child cohort receiving recurring and varied opportunities. No child leadership, organised arts or sport pathway, external competition, public performance, educational visit, professional exposure, child-led community project or sustained mentor relationship is documented. Food drives, healthcare activity and basic educational sponsorship are not counted as Development Environment evidence. No official annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Official HSK website", "url": "https://hskhelpinghandfoundation.com/"},
+            ],
+        ),
+    ),
+
+    "aim_for_seva_chatralayam": _pack(
+        [
+            "aim for seva chatralaya system", "aim for seva chatralayam system",
+            "aim for seva", "aim for seva chatralaya", "aim for seva chatralayam",
+            "aim for seva student hostels", "chatralaya system", "chatralayam system",
+        ],
+        _row(
+            "AIM for Seva's official alumni page says former students primarily proceed to higher education or training and later work as small-business owners, teachers, tutors, technicians, managers or in public services such as the police and Army. This is a network-level pathway statement, not a reported outcome table: no alumni count, cohort denominator, year, named destination or Karnataka-specific result is supplied. The official reports page lists Annual Report 2022-23, but its linked PDF could not be reliably retrieved during this review, so no outcome claim has been lifted from that PDF.",
+            [
+                {"label": "Official alumni page", "url": "https://aimforseva.in/alumni-registration/"},
+                {"label": "Official annual-reports page", "url": "https://aimforseva.in/annual-report/"},
+            ],
+        ),
+        _row(
+            "The official Chatralayam page reports a national network of 91 student homes across 17 states, serving predominantly first-generation rural, agrarian, daily-wage and tribal learners. Children attend a nearby school and receive academic tutoring at the Chatralayam. This establishes a sustained school-access and study-support pathway, but the public page does not specify tutoring frequency, curriculum, level grouping, assessment, learning gains, school-retention data or the model operating at a particular Karnataka home. The official reports page lists Annual Report 2022-23, but the linked PDF was not reliably retrievable in this review.",
+            [
+                {"label": "Official Chatralayam page", "url": "https://aimforseva.in/chatralayam-location/"},
+                {"label": "Official annual-reports page", "url": "https://aimforseva.in/annual-report/"},
+            ],
+        ),
+        _row(
+            "The Chatralayam model includes sports, yoga and cultural and spiritual co-curricular activities alongside academic tutoring. These are genuine wider-opportunity categories, but the official page does not show their frequency, specialist instruction, external competitions, public performances, child leadership, educational travel or progression through a chosen interest. The evidence is national network-level and should not be assumed to apply identically to every Karnataka Chatralayam. Meals, clothing, accommodation and medical care are baseline access and care provisions and are not counted here. The 2022-23 annual-report PDF listed by the organisation was not reliably retrievable during this review.",
+            [
+                {"label": "Official Chatralayam page", "url": "https://aimforseva.in/chatralayam-location/"},
+                {"label": "Official annual-reports page", "url": "https://aimforseva.in/annual-report/"},
+            ],
+        ),
+    ),
+
+    "aina_trust": _pack(
+        [
+            "aina trust", "aina trust bangalore", "aina trust bengaluru",
+            "aina early child care", "aina alternate care",
+        ],
+        _row(
+            "Aina reports that around 400 children from single-parent, orphaned or highly vulnerable families have been integrated into formal education through its Alternate Care programme. It says school attendance is monitored through regular follow-up. A named case, Nithi, is reported as enrolled in regular school and attending evening tuition. These are valid school-entry and continuation signals, but the website does not state the reporting year, cohort denominator, retention period, grade progression, Class 10 or 12 completion or later destinations. No official annual or substantive impact-report PDF was located; the reviewed programme page carries a 2016 copyright and may be dated.",
+            [
+                {"label": "Official Aina programmes page", "url": "https://www.ainatrust.in/programs.html"},
+                {"label": "Official Aina about page", "url": "https://www.ainatrust.in/about-aina.html"},
+            ],
+        ),
+        _row(
+            "Aina's Early Child Care model trains local women regularly through hands-on instruction and supports neighbourhood centres operating from 7 a.m. to 6 p.m. Children receive stimulation through rhymes, songs, dance, crafts, colours, shapes and play. The Alternate Care pathway integrates at-risk children into formal school, follows up attendance and provides evening tuition and coaching. This is a coherent age-specific learning and school-reintegration model, although the website does not publish current centre counts, class frequency for tuition, learner assessment, school-retention rates or measured learning gains. No official annual or substantive impact-report PDF was found.",
+            [
+                {"label": "Official Aina programmes page", "url": "https://www.ainatrust.in/programs.html"},
+            ],
+        ),
+        _row(
+            "Aina reports forming children's catalyst groups so children can learn and exercise their rights, duties and participation. The named child Nithi takes part in drawing, craft and drama, and Alternate Care children performed a cultural programme and patriotic songs before a district-level seminar attended by government departments and civil-society organisations. These provide child participation, creative expression and a public platform beyond tuition. The website does not show how frequently catalyst groups meet, how many children participate or whether opportunities progress over time. Nutrition, health checks and counselling are not counted here. No official annual or substantive impact-report PDF was located, and the programme page may be dated.",
+            [
+                {"label": "Official Aina programmes page", "url": "https://www.ainatrust.in/programs.html"},
+            ],
+        ),
+    ),
+
+    "annapoorna_charitable_trust_balya_home": _pack(
+        [
+            "annapoorna charitable trust", "annapoorna charitable trust balya home",
+            "balya home", "balya childrens home", "balya children's home",
+            "annapoorna trust balya",
+        ],
+        _row(
+            "The official site says Annapoorna Charitable Trust has operated Balya as a long-term home for orphaned and deprived children since 2005, with admissions largely routed through Bengaluru's Child Welfare Committee. It also states that the Trust supports some families so their children can access education. The website does not publish current enrolment, named students, school attendance or retention, Class 10 or 12 results, college entry, vocational completion, employment or independent-living destinations. No official annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Official Trust profile", "url": "https://balyahome.org/about-annapoorna-charitable-trust/"},
+                {"label": "Official Balya website", "url": "https://balyahome.org/"},
+            ],
+        ),
+        _row(
+            "Balya's official material states that resident children receive education and that the Trust seeks to provide educational opportunity irrespective of religion, caste or creed. It does not identify the schools attended, whether Balya operates its own school, the grades served, tutors, study timetable, curriculum, remedial support, assessment or transition preparation. The public evidence therefore establishes education access within a long-term child-care setting, but not a differentiated learning model. No official annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Official Trust profile", "url": "https://balyahome.org/about-annapoorna-charitable-trust/"},
+                {"label": "Official mission page", "url": "https://balyahome.org/balya-home-mission/"},
+            ],
+        ),
+        _row(
+            "The official website contains galleries labelled Kid Activities, Kids Being Kids and Visitors to Balya, but the accessible activity gallery consists of uncatalogued images without dates, activity descriptions, frequency, participants or progression. It is therefore not sufficient evidence of a recurring and varied Development Environment. No documented child leadership, organised arts or sport pathway, competition, public performance, educational visit, sustained external mentoring or child-led community project was found. Food, shelter, protection and medical care are baseline care provisions and are not counted here. No official annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Official activity gallery", "url": "https://balyahome.org/kid-activities-photo-gallery/"},
+                {"label": "Official Balya website", "url": "https://balyahome.org/"},
+            ],
+        ),
+    ),
+
+    "appu_orphan_children_educational_development_trust": _pack(
+        [
+            "appu orphan children educational development trust",
+            "appu orphan childrens educational development trust",
+            "appu orphan children trust", "appu orphan trust", "appu trust",
+        ],
+        _row(
+            "The official SITE123 page identifies the organisation as serving poor children and families and lists educational institutions, mid-day meals, employment and emergency assistance among its objects. It provides no named child, current beneficiary count, return-to-school case, examination result, college or training destination, job outcome or former-resident pathway. The testimonials are generic and do not identify verifiable beneficiaries. No official annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Official APPU website", "url": "https://665ad0c1872b7.site123.me/"},
+            ],
+        ),
+        _row(
+            "The website says APPU conducts educational programmes and has objects to establish schools, colleges and training institutes. It does not identify any currently operating institution, learner cohort, teacher, timetable, curriculum, course, assessment or learning result. Much of the institution-building language is prospective, and the donation page retains unreplaced SITE123 template instructions. These objects and generic services must not be treated as an implemented learning model. No official annual or substantive impact-report PDF was found.",
+            [
+                {"label": "Official APPU website", "url": "https://665ad0c1872b7.site123.me/"},
+            ],
+        ),
+        _row(
+            "The website mentions community-development projects, advocacy and campaigns in generic terms but does not show a defined cohort of children participating in recurring opportunities. No organised arts, sport, club, leadership role, public platform, educational visit, external mentor, workplace exposure or child-led community project is documented. Mid-day meals, emergency aid and basic welfare objects are not counted as Development Environment evidence. No official annual or substantive impact-report PDF was located, and template text materially weakens source confidence.",
+            [
+                {"label": "Official APPU website", "url": "https://665ad0c1872b7.site123.me/"},
+            ],
+        ),
+    ),
+
+    "better_world_charitable_trust": _pack(
+        [
+            "better world charitable trust", "live in better world charitable trust",
+            "live in better world trust", "better world trust",
+        ],
+        _row(
+            "The supplied website belongs to Live in Better World Charitable Trust and gives a Puducherry address, while the PM assignment describes a Better World Charitable Trust in Mysuru. This identity and geography mismatch must be resolved before attributing any claim to the assigned NGO. The site lists scholarships, orphan care, education and transition support as objectives, but publishes no named beneficiary, school completion, college entry, course completion or employment outcome. No official annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Supplied official website requiring identity verification", "url": "https://liveinbetterworldtrust.com/"},
+            ],
+        ),
+        _row(
+            "The website describes intended fee assistance, scholarships, schools, technical institutes, competitive-exam coaching, vocational trades, internships and placement support. It does not identify an operating child education programme, current cohort, school, teachers, class schedule, curriculum, assessment or result. The extensive use of terms such as establish, set up, develop and organize indicates objectives or plans rather than demonstrated delivery. The Puducherry identity mismatch remains unresolved. No official annual or substantive impact-report PDF was found.",
+            [
+                {"label": "Supplied official website requiring identity verification", "url": "https://liveinbetterworldtrust.com/"},
+            ],
+        ),
+        _row(
+            "The website proposes cultural centres, music institutes, art training, exhibitions, competitions, mentorship and life-skills programmes. It gives no dated activity, participant group, frequency, completed output or child progression through these opportunities. These plans must not be presented as an operating Development Environment. The visible medical-camp and food-distribution gallery is baseline welfare activity and is not counted here. No official annual or substantive impact-report PDF was located, and the Puducherry-versus-Mysuru identity mismatch must be resolved first.",
+            [
+                {"label": "Supplied official website requiring identity verification", "url": "https://liveinbetterworldtrust.com/"},
+            ],
+        ),
+    ),
+
+    "chiranthana": _pack(
+        [
+            "chiranthana", "chiranthana school", "chiranthana special school",
+            "chiranthana trust", "chiranthana vocational skills",
+        ],
+        _row(
+            "The official 2025-26 annual report records NIOS pass-outs and the launch of a bakery unit intended to open employment and entrepreneurship opportunities, but it does not provide pass-out or placement counts. The detailed 2023-24 annual report states that 15 individuals with disabilities were working in the vocational unit and receiving monthly stipends. This is a concrete work pathway, but Chiranthana serves both children and adults, so the 15-person figure must not be represented as a child-alumni result. The report also describes students performing in NIOS and vocational routes without publishing cohort results or later destinations.",
+            [
+                {"label": "Official Annual Report 2025-26", "url": "https://chiranthana.in/wp-content/uploads/2020/12/Annual-Report-2025-26.pdf"},
+                {"label": "Official Annual Report 2023-24", "url": "https://chiranthana.in/wp-content/uploads/2020/12/Annual-Report-2024.pdf"},
+            ],
+        ),
+        _row(
+            "Chiranthana documents individual lesson plans, customised activity-based instruction, literacy and numeracy, coding, computer use, augmentative communication through AVAZ and PECS, NIOS secondary and senior-secondary preparation, career counselling, job-readiness and vocational pathways including bakery, culinary work, embroidery, block printing, macrame and packaging. Its reports also describe technology-assisted communication and repeated skill training across Bengaluru and rural centres. This is a differentiated academic-to-vocational model, although public reporting does not provide learner-level assessment gains, NIOS pass rates or placement conversion by age group.",
+            [
+                {"label": "Official programmes page", "url": "https://chiranthana.in/programs/"},
+                {"label": "Official Annual Report 2023-24", "url": "https://chiranthana.in/wp-content/uploads/2020/12/Annual-Report-2024.pdf"},
+                {"label": "Official Annual Report 2025-26", "url": "https://chiranthana.in/wp-content/uploads/2020/12/Annual-Report-2025-26.pdf"},
+            ],
+        ),
+        _row(
+            "The 2023-24 annual report documents theatre, music and STEM activity; field visits to a resort and police station; participation at Kanteerava Stadium; public exhibitions at institutions and companies including IISc, Lenovo, Mercedes-Benz and Biocon; and the Undefined public event that gave children a talent platform and brought disability-rights and employment discussions before external guests. Vocational artists also created products for corporate and individual customers, giving market-facing responsibility. This is varied exposure, public expression and applied work beyond core instruction. However, activities involve a mixed population of children, teenagers and adults with disabilities and should not all be attributed to every child. Therapy and healthcare are not counted here.",
+            [
+                {"label": "Official Annual Report 2023-24", "url": "https://chiranthana.in/wp-content/uploads/2020/12/Annual-Report-2024.pdf"},
+                {"label": "Official Annual Report 2025-26", "url": "https://chiranthana.in/wp-content/uploads/2020/12/Annual-Report-2025-26.pdf"},
+            ],
+        ),
+    ),
+
+    "christel_house_india": _pack(
+        [
+            "christel house india", "christel house", "christel house bangalore",
+            "christel house bengaluru", "christel house india foundation",
+        ],
+        _row(
+            "The official Annual Report 2024-25 states that every Grade 12 student passed the board examination for the seventh consecutive year, all with First Division results, and that 100% of graduates entered tertiary education for the fourth consecutive year. It reports 99% of graduates in education, training or employment and gives named destinations including Pavithra at Siemens Healthineers, Arun as a UI/UX team lead, Anish as an entrepreneur, Sowmya at Hewlett-Packard, Girish as a practising advocate and Poornima at IBM. These are repeated cohort and named life outcomes reported by the organisation.",
+            [
+                {"label": "Official Annual Report 2024-25", "url": "https://in.christelhouse.org/wp-content/uploads/2025/11/Christel-House-India-Annual-Report-FY-2024-2025.pdf-REDUCED-SIZE.pdf"},
+            ],
+        ),
+        _row(
+            "Christel House describes a minimum 18-year pathway for each child, from kindergarten at about age five through tertiary education and into employment at about age 23. The model combines rigorous full-day academics with social-emotional learning, character, citizenship and leadership development, and a College & Careers programme providing career guidance and tertiary scholarships. Graduate narratives show long-term guidance from school through university and work. The annual report provides strong pathway evidence, though it does not publish subject-level learning gains or detailed remediation methods for each campus.",
+            [
+                {"label": "Official Annual Report 2024-25", "url": "https://in.christelhouse.org/wp-content/uploads/2025/11/Christel-House-India-Annual-Report-FY-2024-2025.pdf-REDUCED-SIZE.pdf"},
+                {"label": "Official admissions page", "url": "https://in.christelhouse.org/student-admissions"},
+            ],
+        ),
+        _row(
+            "The 2024-25 annual report documents girls competing in the Karnataka B-Division Women's League and three being shortlisted for state under-13 trials. Across the India campuses it also records professional speaker and career-exposure sessions, interschool sport, science, arts and academic competitions, internal Tech-Fest, Mathematics and Agriculture exhibitions, Student Council elections, Youth Parliament and a student selected for HundrED's global Youth Ambassador programme who is developing a community-focused blog and planning engagement with local government. This is varied external exposure, competition, public presentation, leadership and civic agency. The activities occur across different campuses and cohorts and should not be assigned to every child. Meals, healthcare and counselling are not counted here.",
+            [
+                {"label": "Official Annual Report 2024-25", "url": "https://in.christelhouse.org/wp-content/uploads/2025/11/Christel-House-India-Annual-Report-FY-2024-2025.pdf-REDUCED-SIZE.pdf"},
+            ],
+        ),
+    ),
+
+    "grg_grace_trust": _pack(
+        [
+            "grg grace trust", "grace open school", "grace open school and training centre",
+            "grace love and life", "grg grace open school",
+        ],
+        _row(
+            "The official website reports about 75 daily learners and displays a counter of 1,200 students completed. It does not define what completed means, give a reporting period or separate children from other trainees. No named student, mainstream-school transition, Class 10 or 12 result, NIOS completion, college destination, vocational certification or employment outcome is published. The 1,200 figure is therefore not usable as a progression count without clarification. No official annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Official GRACE Open School website", "url": "https://graceloveandlife.org/"},
+            ],
+        ),
+        _row(
+            "GRACE Open School describes individualised remedial education with one teacher handling two or three children, academic instruction from LKG to Class 12, basics-to-age-level progression, phonics, handwriting, spoken English, life skills and behaviour modification. This is a clear intensive and adapted learning model for children with developmental and learning needs. However, the website does not provide learner assessment tools, individual plans, attendance, grade progression, board affiliation or measured gains, and one service section still contains lorem-ipsum template text. The institute describes itself as self-financed, but fee and subsidy arrangements are not public. No official annual or substantive impact-report PDF was found.",
+            [
+                {"label": "Official GRACE Open School website", "url": "https://graceloveandlife.org/"},
+            ],
+        ),
+        _row(
+            "The website documents remedial education, life skills, counselling and behaviour support, which belong primarily to the Learning Model or baseline support and are not counted here. It does not show the same children participating in recurring arts, sport, clubs, external competitions, public performances, educational visits, child leadership, community projects, professional exposure or sustained external mentoring. No varied Development Environment can therefore be substantiated from the public material. No official annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Official GRACE Open School website", "url": "https://graceloveandlife.org/"},
+            ],
+        ),
+    ),
+
+    "hope_home_foundation": _pack(
+        [
+            "hope home foundation", "hope home childrens foundation",
+            "hope home children's foundation", "hhf world", "hhf children home",
+        ],
+        _row(
+            "The official website offers child sponsorship and says sponsors receive school reports and regular updates for children under the Foundation's care. This indicates that some children are enrolled in school, but no current enrolment, named learner, attendance or grade progression, Class 10 or 12 result, college entry, training completion, employment or former-resident outcome is published. The footer refers to 2014-2023, so current operating status and scale require confirmation. No official annual or substantive impact-report PDF for this Bengaluru entity was located.",
+            [
+                {"label": "Official Hope Home Foundation website", "url": "https://hhfworld.com/"},
+            ],
+        ),
+        _row(
+            "School reports are mentioned as part of the sponsorship updates, but the public site does not explain where children study, the grades served, whether tutoring occurs at the home, teachers, timetable, curriculum, remedial instruction, assessment or transition preparation. The evidence therefore supports education access, not a demonstrated learning model. Several internal pages were inaccessible during review, and the site footer appears stale. No official annual or substantive impact-report PDF was found.",
+            [
+                {"label": "Official Hope Home Foundation website", "url": "https://hhfworld.com/"},
+            ],
+        ),
+        _row(
+            "The official navigation lists events, activities and a media gallery, but those internal pages were not reliably accessible and the home page gives no dated or described child activity. No recurring arts or sport pathway, competition, public performance, child leadership, educational visit, external mentor, workplace exposure or child-led project can therefore be confirmed. Sponsorship, food, shelter, healthcare and routine care are not counted as Development Environment evidence. No official annual or substantive impact-report PDF was located, and current operations require direct verification.",
+            [
+                {"label": "Official Hope Home Foundation website", "url": "https://hhfworld.com/"},
+            ],
+        ),
+    ),
+
+    "ashakirana_education_and_rehabilitation_society": _pack(
+        [
+            "ashakirana education and rehabilitation society", "ashakirana society",
+            "ashakirana education rehabilitation society", "aers", "asha kirana aers",
+            "ashakirana residential special school",
+        ],
+        _row(
+            "AERS reports that around 800 blind children have been supported since its residential blind school began in 1997 and that the school has achieved 100% SSLC results every year since 2008-09. These are repeated school-completion signals, but the website does not publish annual cohort sizes, marks, later PUC or college entry, employment or named alumni. The intellectual-disability school reports more than 600 children benefited and a current cohort of 45, but no mainstreaming or adult destination count. No official annual or substantive impact-report PDF was located; the figures are organisation-reported on the official website.",
+            [
+                {"label": "Official AERS initiatives page", "url": "https://ashakiranasociety.org/our-initiatives/"},
+            ],
+        ),
+        _row(
+            "The blind school provides education through Class 10 using special educators, Braille, computer instruction, music and sport. The residential school for children with intellectual disabilities uses special educators and caretakers to teach functional life skills and aims to support formal-school mainstreaming where appropriate. These are disability-specific academic and functional pathways. The site does not provide individual education plans, assessment tools, class schedules, teacher-child ratios, SSLC preparation detail or mainstreaming results. No official annual or substantive impact-report PDF was found.",
+            [
+                {"label": "Official AERS initiatives page", "url": "https://ashakiranasociety.org/our-initiatives/"},
+            ],
+        ),
+        _row(
+            "AERS reports that blind students participate in cultural events, sport and quizzes organised by district- and state-level authorities, have won prizes and also enter blind-cricket tournaments. Music is part of the school provision. This is credible variety across arts, sport, knowledge competitions and external platforms beyond ordinary instruction. The website does not give event years, frequency, participant counts, award details or progression by child, so current depth should be verified. National-festival celebrations and Louis Braille Day alone are not treated as sufficient. Food, accommodation, healthcare and therapy are not counted here. No official annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Official AERS initiatives page", "url": "https://ashakiranasociety.org/our-initiatives/"},
+            ],
+        ),
+    ),
+
+    "kalkeri_sangeet_vidyalaya": _pack(
+        [
+            "kalkeri sangeet vidyalaya", "kalkeri sangeeth vidyalaya",
+            "kalkeri music school", "ksv", "ksv kalkeri",
+        ],
+        _row(
+            "The official Annual Report 2020-21 states that all Class 10 students passed, 14 of the 15 who passed entered PU colleges, 65 students were in higher education and ten completed higher education that year. It reports that 85% of students finishing college continued into undergraduate study and gives named pathways: Sangeeta Chavan completed a Master's in English and was expected to join KSV as an English teacher, while Prakash Chavan completed an MBA and became a Service Delivery Manager at IndusInd Bank. The report is substantive but historical; current cohort outcomes should be checked against a newer report.",
+            [
+                {"label": "Official Annual Report 2020-21", "url": "https://www.ksv.org.in/wp-content/uploads/2022/02/KSV_AnnualReport_2020-2021_web.pdf"},
+                {"label": "Official annual-report page", "url": "https://www.ksv.org.in/who-we-are/annual-report/"},
+            ],
+        ),
+        _row(
+            "KSV's annual report describes child-centred education that accommodates different learning styles and pace, with teacher training, reciprocal teaching, group work, peer-to-peer learning, concrete teaching aids and continuous evaluation in lower grades. The current academic page adds broad curriculum coverage, technology use and continuing financial and moral support into higher education. Performing arts are not occasional: current official material describes three hours of instruction daily, five days a week, across vocal music, tabla, sitar, violin, dance and drama. This is a distinctive integrated academic-and-arts model, though the latest fully reviewed report is from 2020-21.",
+            [
+                {"label": "Official Annual Report 2020-21", "url": "https://www.ksv.org.in/wp-content/uploads/2022/02/KSV_AnnualReport_2020-2021_web.pdf"},
+                {"label": "Official academic-studies page", "url": "https://www.ksv.org.in/what-we-do/academic-studies/"},
+                {"label": "Official performing-arts page", "url": "https://www.ksv.org.in/what-we-do/performing-arts/"},
+            ],
+        ),
+        _row(
+            "Every student is treated as a young artist within a sustained multi-disciplinary programme spanning Hindustani vocal music, tabla, sitar, violin, folk and Kathak dance, drama, arts and crafts, games and sport. The current site says students receive a live performance platform through Manch Pradarshan every other Friday, individually or in groups, building stage experience and confidence. The 2020-21 report also records state music examinations, with all five entrants passing. This is repeated artistic practice, certification and public performance rather than generic extracurricular activity. The latest fully reviewed annual report is historical, so current scale should be confirmed. Residential care and meals are not counted here.",
+            [
+                {"label": "Official performing-arts page", "url": "https://www.ksv.org.in/what-we-do/performing-arts/"},
+                {"label": "Official Annual Report 2020-21", "url": "https://www.ksv.org.in/wp-content/uploads/2022/02/KSV_AnnualReport_2020-2021_web.pdf"},
+            ],
+        ),
+    ),
+
+    "peniel_social_charitable_trust": _pack(
+        [
+            "peniel social charitable trust", "peniel charitable trust", "peniel india",
+            "peniel childrens home", "peniel children's home", "peniel english school",
+            "aseer boys home", "avia girls home",
+        ],
+        _row(
+            "Peniel reports walking alongside about 1,000 children over roughly 35 years through its two children's homes and school. This is a cumulative care-and-education reach figure, not a progression outcome. The official pages publish no named former resident, school completion rate, Class 10 or 12 result, PUC or college admission, vocational completion, employment or independent-living destination. No official annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Official Peniel website", "url": "https://penielindia.org/"},
+                {"label": "Official children's-home page", "url": "https://penielindia.org/childrens-home"},
+            ],
+        ),
+        _row(
+            "Peniel English School developed from a kindergarten into a primary and high school for children from slums and villages and currently says it assists children in three slum areas and ten villages, including transport access. The school describes a holistic pedagogy covering studies, skills, creativity, physical and mental development. It does not publish board affiliation, grade-wise enrolment, curriculum, class schedule, teacher ratios, remedial method, assessment, learning gains or transition results. The public evidence therefore establishes a long-running direct school but not a sufficiently detailed learning methodology. No official annual or substantive impact-report PDF was found.",
+            [
+                {"label": "Official school page", "url": "https://penielindia.org/school"},
+                {"label": "Official Peniel website", "url": "https://penielindia.org/"},
+            ],
+        ),
+        _row(
+            "The children's-home page describes recurring football and volleyball, gardening, animal-care responsibilities, Indian crafts, construction play with Lego and shared recreational spaces after schoolwork. This provides a varied day-to-day environment involving sport, creativity and practical responsibility beyond basic care. The site does not show external competitions, public performances, educational visits, structured leadership, professional mentors or progression through these interests, so the opportunity depth remains limited. Food, shelter and the general family-like environment are baseline care and are not counted here. No official annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Official children's-home page", "url": "https://penielindia.org/childrens-home"},
+            ],
+        ),
+    ),
+
+    "rashtrotthana_parishat": _pack(
+        [
+            "rashtrotthana parishat", "rashtrothana parishat", "rashtrotthana",
+            "tapas saadhana", "tapas and saadhana", "rashtrotthana tapas",
+            "rashtrotthana saadhana", "tapas project", "saadhana project",
+        ],
+        _row(
+            "The current official Tapas page reports 438 beneficiaries, 32 IIT admissions, 81 NIT admissions and 239 admissions to other top engineering colleges. The current Saadhana page reports 311 beneficiaries, two AIIMS, 47 MBBS, eight BAMS and 176 admissions to other top professional courses, with 45 learners clearing NEET in 2023. These are unusually concrete professional-education destinations. Separate official Rashtrotthana pages display different aggregate totals, so figures from different pages must not be merged; current cumulative counts should be verified before external publication. The annual-reports page was checked and lists a 2023-24 Kannada report and 2020-21 English report.",
+            [
+                {"label": "Official Tapas page", "url": "https://www.rashtrotthana.org/education/tapas/"},
+                {"label": "Official Saadhana page", "url": "https://www.rashtrotthana.org/education/saadhana/"},
+                {"label": "Official annual-reports page", "url": "https://www.rashtrotthana.org/annual-reports/"},
+            ],
+        ),
+        _row(
+            "Tapas is a free two-year residential PUC and IIT-JEE pathway for economically disadvantaged boys selected through examinations, household-income verification and a residential selection camp. Around 40 students are selected per cohort and academic support is provided by BASE with tuition, study material and entrance preparation. Saadhana is a parallel two-year residential pathway for meritorious underprivileged rural girls targeting NEET, medical and other professional courses, with a later teacher-education stream. This is a highly structured selection-to-professional-course model. The official pages do not publish detailed assessment schedules, individual mentoring loads or attrition. The annual-reports page was also checked.",
+            [
+                {"label": "Official Tapas page", "url": "https://www.rashtrotthana.org/education/tapas/"},
+                {"label": "Official Saadhana page", "url": "https://www.rashtrotthana.org/education/saadhana/"},
+                {"label": "Official annual-reports page", "url": "https://www.rashtrotthana.org/annual-reports/"},
+            ],
+        ),
+        _row(
+            "The reviewed official programme pages are overwhelmingly focused on intensive academic preparation and professional-course transition. They do not demonstrate a varied recurring environment of arts, sport, student governance, civic projects, public performance, educational travel or sustained non-academic professional exposure for the Tapas and Saadhana cohorts. Academic coaching, career preparation and entrance mentoring belong to the Learning Model and are not counted again here. Residential accommodation, food and routine welfare are baseline provisions and are not counted. The annual-reports page was checked, but no stronger programme-specific Development Environment evidence was found in the reviewed public material.",
+            [
+                {"label": "Official Tapas page", "url": "https://www.rashtrotthana.org/education/tapas/"},
+                {"label": "Official Saadhana page", "url": "https://www.rashtrotthana.org/education/saadhana/"},
+                {"label": "Official annual-reports page", "url": "https://www.rashtrotthana.org/annual-reports/"},
+            ],
+        ),
+    ),
+
+
+    "amateur_sports_development_federation": _pack(
+        [
+            "amateur sports development federation", "asdf india",
+            "amateur sports development federation india", "asdf sports federation",
+        ],
+        _row(
+            "The official website describes a recently established Section 8 federation intended to promote amateur and grassroots sport, but it does not publish a named child athlete, age-defined beneficiary cohort, tournament result, scholarship, academy transition or progression to higher-level competition. A talent-identification page remains a placeholder, so it cannot be treated as proof that a delivered pathway exists. No official annual or substantive impact-report PDF was located. The website's objectives are therefore prospective organisational claims rather than child-progression evidence.",
+            [
+                {"label": "Official ASDF website", "url": "https://asdfindia.org/"},
+                {"label": "Official talent-identification page", "url": "https://asdfindia.org/talent-identification.php"},
+            ],
+        ),
+        _row(
+            "ASDF proposes talent identification, scientific coaching, leagues, seminars, athlete development and integration of sport with education. The public pages do not identify an operating child cohort, coaches, training calendar, selection process, attendance, assessment, safeguarding process or delivered competition cycle. Paid membership and stated objectives do not establish a child-learning model. No official annual or substantive impact-report PDF was found, and the thin public evidence requires in-person verification before describing the model as operational.",
+            [
+                {"label": "Official ASDF website", "url": "https://asdfindia.org/"},
+                {"label": "Official seminars and webinars page", "url": "https://asdfindia.org/seminar-webinar.php"},
+            ],
+        ),
+        _row(
+            "Sport can create discipline, teamwork, competition and public achievement, but the official site does not document a recurring programme delivered to underserved children. No completed league, external competition pathway, leadership responsibility, public performance, educational exposure, mentor relationship or child-led community project is evidenced for a defined cohort. The sport label alone is not sufficient Development Environment evidence. No official annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Official ASDF website", "url": "https://asdfindia.org/"},
+                {"label": "Official talent-identification page", "url": "https://asdfindia.org/talent-identification.php"},
+            ],
+        ),
+    ),
+
+    "arivu_trust": _pack(
+        [
+            "arivu trust", "arivu trust mangaluru", "arivu early intervention centre",
+            "arivu early intervention center", "arivu special education",
+        ],
+        _row(
+            "Arivu reports serving more than 5,000 children and mainstreaming more than 2,000, and states that many former students completed Class 10, PUC and degrees with remedial support. These are material progression claims, but the website gives no reporting period, cohort denominator, named destinations, school list or method for counting mainstreaming. Its January-May 2026 document is a one-page activity chart rather than an annual or impact report. The claims should therefore be treated as organisation-reported and not converted into verified completion rates.",
+            [
+                {"label": "Official programmes page", "url": "https://arivutrust.org/our-programs/"},
+                {"label": "Official January-May 2026 activity document", "url": "https://arivutrust.org/wp-content/uploads/2026/05/Arivu-Trust-Acitivities-Jan-May-2026.pdf"},
+            ],
+        ),
+        _row(
+            "Arivu documents small-group and individualised special education, parent-set goals, periodic feedback, school-inclusion support, functional academics, NIOS preparation and pre-vocational and vocational training. Its NIOS groups reportedly contain four to seven learners and progress through foundation levels toward secondary and senior-secondary examinations. The model also adapts teaching content and delivery to each disability profile. This is a differentiated learning pathway, although the website does not publish assessment gains, pass rates, attendance, attrition or programme-level cohort results. The available 2026 PDF is an activity summary, not a substantive annual report.",
+            [
+                {"label": "Official programmes page", "url": "https://arivutrust.org/our-programs/"},
+                {"label": "Official January-May 2026 activity document", "url": "https://arivutrust.org/wp-content/uploads/2026/05/Arivu-Trust-Acitivities-Jan-May-2026.pdf"},
+            ],
+        ),
+        _row(
+            "Older learners make products such as paper and jute goods, candles, jewellery and cleaning products and may receive a nominal stipend according to capability. This provides practical responsibility and a sheltered-work exposure pathway for the older vocational cohort. Singing, dancing, exercise, art and music are described mainly as therapeutic or classroom activities; therapy is not counted as Development Environment evidence, and no external competitions, public exhibitions, educational visits, youth governance or broad leadership pathway is demonstrated. The one-page 2026 activity document is not a substantive annual report, and these opportunities should not be attributed to every child.",
+            [
+                {"label": "Official programmes page", "url": "https://arivutrust.org/our-programs/"},
+                {"label": "Official January-May 2026 activity document", "url": "https://arivutrust.org/wp-content/uploads/2026/05/Arivu-Trust-Acitivities-Jan-May-2026.pdf"},
+            ],
+        ),
+    ),
+
+    "building_blocks_morning_glory": _pack(
+        [
+            "building blocks morning glory pre primary school", "building blocks morning glory",
+            "morning glory pre primary school", "morning glory learning centre",
+            "morning glory learning center", "building blocks india morning glory",
+        ],
+        _row(
+            "Building Blocks' official learning-centre page reports that Morning Glory was established in 2019, currently has 88 students and has had 55 graduates. The page does not define graduation, identify the primary schools entered, provide retention data or show later academic destinations. Building Blocks publishes stronger transition statements for other centres and for its organisation-wide Project +10 programme, but those results must not be transferred to Morning Glory. No official annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Official learning-centres page", "url": "https://www.buildingblocksindia.org/learning-centers"},
+                {"label": "Official Building Blocks website", "url": "https://www.buildingblocksindia.org/"},
+            ],
+        ),
+        _row(
+            "Morning Glory is presented as a direct early-learning centre built for children from the community around a resort. The centre includes child-friendly mirrors, gardens and chalkboards and the wider Building Blocks model is pre-primary preparation. However, the Morning Glory page does not state ages, daily schedule, curriculum, teacher numbers, class frequency, assessment, school-readiness measures or transition support. Organisation-wide practices from other centres cannot automatically be assumed here. No official annual or substantive impact-report PDF was found.",
+            [
+                {"label": "Official learning-centres page", "url": "https://www.buildingblocksindia.org/learning-centers"},
+                {"label": "Official Building Blocks website", "url": "https://www.buildingblocksindia.org/"},
+            ],
+        ),
+        _row(
+            "The official Morning Glory description identifies gardens and purpose-designed learning spaces, but it does not document recurring organised sport, arts progression, clubs, external competitions, public performance, educational visits, child leadership, professional exposure or community projects. A pleasant facility is not sufficient evidence of a varied Development Environment. Meals and basic early-childhood care are baseline provisions and are not counted here. No official annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Official learning-centres page", "url": "https://www.buildingblocksindia.org/learning-centers"},
+            ],
+        ),
+    ),
+
+    "cerebloom_academy": _pack(
+        [
+            "cerebloom academy for rural education and science", "cerebloom academy",
+            "cerebloom", "cares cerebloom", "cerebloom cares",
+        ],
+        _row(
+            "Cerebloom reports reaching more than 6,000 students, training more than 1,000 teachers and conducting more than 120 workshops. These are reach figures rather than child progression. The official site does not publish CET or NEET results, scholarship selections, college admissions, named alumni, course completions or employment outcomes. No official annual or substantive impact-report PDF was located, so the figures remain organisation-reported and should not be interpreted as outcome rates.",
+            [
+                {"label": "Official Cerebloom website", "url": "https://cerebloom.org/"},
+                {"label": "Official impact page", "url": "https://cerebloom.org/impact/"},
+            ],
+        ),
+        _row(
+            "The official site describes concept-driven CET and NEET preparation, hands-on Science Fests, technology-assisted learning, educator development and long-term Young Scholars mentoring. This is more specific than generic rural-school support and suggests academic, experimental and mentoring components. The public material does not state cohort size, class frequency, duration, assessment, mentor load, selection criteria, attendance or measured learning gains. No official annual or substantive impact-report PDF was found, so delivery consistency across the reported 6,000 students cannot be assessed.",
+            [
+                {"label": "Official Cerebloom website", "url": "https://cerebloom.org/"},
+                {"label": "Official programmes page", "url": "https://cerebloom.org/programs/"},
+            ],
+        ),
+        _row(
+            "Science Fests and hands-on experiments give students project creation, scientific presentation and interaction with a wider public. These are credible opportunity signals beyond ordinary lessons. The site does not show how many children receive them, whether participation is recurring, or whether students progress to external competitions, clubs, leadership, educational visits or professional placements. Development Environment evidence is therefore meaningful but concentrated in science rather than demonstrably varied across arts, sport, civic activity and leadership. No official annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Official Cerebloom website", "url": "https://cerebloom.org/"},
+                {"label": "Official programmes page", "url": "https://cerebloom.org/programs/"},
+            ],
+        ),
+    ),
+
+    "dream_india_network": _pack(
+        [
+            "dream india network", "dream india network bangalore", "dream india network bengaluru",
+            "din dream india network",
+        ],
+        _row(
+            "Dream India Network describes work with at-risk young people, foster homes, education and scholarships, but its public website does not provide a defined child cohort, school-return count, Class 10 or 12 completion, college destination, course completion, employment outcome or named alumnus. The organisation's broad network framing makes it unclear which services it directly operates and which it coordinates. No official annual or substantive impact-report PDF was located, so no progression claim can be substantiated from current public evidence.",
+            [
+                {"label": "Official Dream India Network website", "url": "https://www.dreamindianetwork.net/"},
+            ],
+        ),
+        _row(
+            "The website refers to education, child sponsorship, vulnerable youth and multiple partner activities, but it does not set out a recurring curriculum, centre schedule, teachers, assessment, mentoring structure, transition preparation or participant scale. A current 'Curiosity' activity with Thomson Reuters included career guidance, STEM experiments and interactive learning, but one event does not establish the organisation's core instructional model. No official annual or substantive impact-report PDF was found.",
+            [
+                {"label": "Official Dream India Network website", "url": "https://www.dreamindianetwork.net/"},
+            ],
+        ),
+        _row(
+            "The documented Thomson Reuters 'Curiosity' activity gave participating children workplace exposure, career interaction and hands-on STEM experiences. This is a useful external-exposure example, but the public evidence does not show that it is recurring, how many children participated or whether the same cohort also receives arts, sport, leadership, public performance or community-project opportunities. Generic celebrations and photographs are not sufficient to establish a varied Development Environment. No official annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Official Dream India Network website", "url": "https://www.dreamindianetwork.net/"},
+            ],
+        ),
+    ),
+
+    "dwarakamai_foundation": _pack(
+        [
+            "dwarakamai foundation", "dwarakamai foundation gadag", "dwarakamai education foundation",
+        ],
+        _row(
+            "The official impact page says the organisation was less than a year old when the page was written and displays zero-valued impact counters. It describes Siksha Sahara and Feed the Needy but publishes no school return, grade completion, examination, scholarship, college, training or employment outcome. No official annual or substantive impact-report PDF was located. The organisation should therefore be treated as an early-stage lead with no demonstrated child progression in the reviewed public material.",
+            [
+                {"label": "Official impact page", "url": "https://www.dwarakamaifoundation.com/our-impact"},
+                {"label": "Official Dwarakamai website", "url": "https://www.dwarakamaifoundation.com/"},
+            ],
+        ),
+        _row(
+            "Siksha Sahara is described as English-language training and educational-material support, but the website gives no participating schools, child count, class frequency, teacher profile, curriculum, duration, assessment or learning gains. Stationery distribution and broad education language are access support, not a differentiated learning model. No official annual or substantive impact-report PDF was found, and current programme delivery requires verification.",
+            [
+                {"label": "Official impact page", "url": "https://www.dwarakamaifoundation.com/our-impact"},
+                {"label": "Official Dwarakamai website", "url": "https://www.dwarakamaifoundation.com/"},
+            ],
+        ),
+        _row(
+            "The reviewed official pages do not document child clubs, organised arts or sport, external competitions, public performance, educational visits, leadership, mentors, practical projects or community responsibility for a recurring child cohort. Food distribution is baseline welfare and is not counted as Development Environment evidence. No official annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Official impact page", "url": "https://www.dwarakamaifoundation.com/our-impact"},
+            ],
+        ),
+    ),
+
+    "happy_feet_trust": _pack(
+        [
+            "happy feet trust", "happy feet charitable trust", "happy feet sports trust",
+            "happy feet cbe",
+        ],
+        _row(
+            "The official Annual Report 2023-24 documents concrete athlete progression: Santhanakumar won state-level medals and later competed nationally; Harini won zonal track events; Suganya qualified for state-level competition; and Muthuraja won Asian Para Games and national medals. These are strong sport outcomes. However, the report is centred on Coimbatore and Tamil Nadu and includes both children and adults, while this PM lead is recorded as Bengaluru. None of these results should therefore be presented as outcomes of a Karnataka child cohort without operational verification.",
+            [
+                {"label": "Official Annual Report 2023-24", "url": "https://happyfeetcbe.org/images/hf-annual-report-23-24.pdf"},
+                {"label": "Official about page", "url": "https://happyfeetcbe.org/about-us"},
+            ],
+        ),
+        _row(
+            "Happy Feet identifies athletes with limited financial resources, connects them to coaching, equipment and competition opportunities and provides targeted support according to the sport and athlete. The annual report demonstrates an athlete-development pathway rather than a generic sports event. It does not provide a Karnataka programme, age-defined child cohort, training frequency, coach-to-athlete ratio, selection rubric or assessment system. The model is credible for the documented Tamil Nadu athletes but cannot be transferred automatically to Bengaluru.",
+            [
+                {"label": "Official Annual Report 2023-24", "url": "https://happyfeetcbe.org/images/hf-annual-report-23-24.pdf"},
+                {"label": "Official beneficiaries page", "url": "https://happyfeetcbe.org/our-beneficiaries"},
+            ],
+        ),
+        _row(
+            "The 2023-24 annual report demonstrates a sustained external competition environment, including zonal, state, national and international progression and equipment support. This is high-quality sport exposure for the named athletes. The report does not evidence a varied environment across arts, civic participation, educational visits, child leadership or professional mentoring, and it combines minors and adults in Tamil Nadu. Development Environment evidence is therefore strong but sport-specific and not established for a Karnataka child cohort. Basic financial assistance and equipment alone are not counted separately.",
+            [
+                {"label": "Official Annual Report 2023-24", "url": "https://happyfeetcbe.org/images/hf-annual-report-23-24.pdf"},
+            ],
+        ),
+    ),
+
+    "kaliyuva_mane_divya_deepa": _pack(
+        [
+            "kaliyuva mane", "kaliyuva mane divya deepa", "kaliyuva mane run by divya deepa charitable trust",
+            "divya deepa charitable trust", "divyadeepa trust", "divya deepa trust",
+        ],
+        _row(
+            "Divya Deepa publishes named progression stories from Kaliyuva Mane. Bhoomika cleared Class 10 in 2020, pursued nursing and is reported to work as a nurse; Pranesh completed Class 10 in 2023 and entered a diploma; Srikanth, who has dyslexia, passed Class 10 and entered PUC Fine Arts; and Ramesh completed board examinations in 2019 and works in dairy. These are concrete education-to-training or work pathways. The official reports page lists annual reports only through 2021-22 and audit reports through 2022-23, so more recent cohort-wide completion and destination data remain unavailable.",
+            [
+                {"label": "Official Kaliyuva Mane website", "url": "https://divyadeepatrust.org/"},
+                {"label": "Official audit and annual-reports page", "url": "https://divyadeepatrust.org/audit-reports/"},
+            ],
+        ),
+        _row(
+            "Kaliyuva Mane is a free residential alternative school for children who are out of school, have struggled in conventional classrooms or have learning and traumatic-background challenges. It is NIOS-accredited and uses flexible, child-paced learning and a school-for-the-child philosophy rather than age-standardised progression. Named stories show movement from alternative schooling into board examinations, PUC, diplomas and work. The official reports are historical and do not provide current learner counts, subject-level gains, assessment schedules or recent completion rates.",
+            [
+                {"label": "Official Kaliyuva Mane website", "url": "https://divyadeepatrust.org/"},
+                {"label": "Official audit and annual-reports page", "url": "https://divyadeepatrust.org/audit-reports/"},
+            ],
+        ),
+        _row(
+            "The school describes arts, crafts, games and practical participation in everyday community life, and one named learner progressed into Fine Arts. These provide creative activity and responsibility beyond classroom instruction. The reviewed public material does not establish current external competitions, public performances, formal student governance, educational visits, professional mentors or a broad recurring exposure calendar for all children. Residential care, meals and accommodation are baseline provisions and are not counted here. The latest listed annual report is 2021-22, so current opportunity depth requires confirmation.",
+            [
+                {"label": "Official Kaliyuva Mane website", "url": "https://divyadeepatrust.org/"},
+                {"label": "Official audit and annual-reports page", "url": "https://divyadeepatrust.org/audit-reports/"},
+            ],
+        ),
+    ),
+
+    "makkala_jagriti": _pack(
+        [
+            "makkala jagriti", "makkala jagruthi", "makkala jagriti trust",
+            "makkala jagruthi trust", "mj makkala jagriti",
+        ],
+        _row(
+            "Makkala Jagriti's official material publishes named long-term outcomes: Murali, once a school dropout, represented India at a world championship in 2017, won two bronze medals and later trained thousands of children; Mahesh became a Regional Training Manager at Titan; and Asfiya became an English facilitator at Makkala Jagriti. These are striking individual pathways but are historical and organisation-wide rather than cohort outcome data. An Annual Report 2024-25 is listed on the official site, but automated access was blocked during this review, so no additional figures have been claimed from the PDF.",
+            [
+                {"label": "Official Makkala Jagriti website", "url": "https://makkalajagriti.org/"},
+                {"label": "Official about and reports page", "url": "https://makkalajagriti.org/about-us/"},
+                {"label": "Listed Annual Report 2024-25", "url": "https://makkalajagriti.org/wp-content/uploads/2025/12/MJ_Annual-Report_2024-25.pdf"},
+            ],
+        ),
+        _row(
+            "Makkala Jagriti operates multiple age- and setting-specific models: early-childhood development, the SPICE whole-school model in government schools, learning centres, youth skilling and CCI transformation. Public programme pages describe socio-emotional learning, foundational learning, creative development, life skills and youth pathways. This establishes a substantive institutional model, but the interventions differ by programme and site and should not be collapsed into one experience. The listed 2024-25 annual report could not be reliably retrieved in this review, so current cohort size, learning gains and transition rates remain unverified.",
+            [
+                {"label": "Official programmes website", "url": "https://makkalajagriti.org/"},
+                {"label": "Official about and reports page", "url": "https://makkalajagriti.org/about-us/"},
+                {"label": "Listed Annual Report 2024-25", "url": "https://makkalajagriti.org/wp-content/uploads/2025/12/MJ_Annual-Report_2024-25.pdf"},
+            ],
+        ),
+        _row(
+            "Named stories demonstrate sustained taekwondo progression, youth leadership and former beneficiaries returning as trainers or facilitators. The organisation also describes creative expression and young people acting as community change agents. These are meaningful sport, leadership and civic-opportunity signals. They are drawn from different programmes and years and cannot be attributed to every current child. Food, counselling and ordinary learning-centre provision are not counted as Development Environment evidence. The listed 2024-25 annual report was access-blocked and has not been represented as read.",
+            [
+                {"label": "Official Makkala Jagriti website", "url": "https://makkalajagriti.org/"},
+                {"label": "Official about and reports page", "url": "https://makkalajagriti.org/about-us/"},
+            ],
+        ),
+    ),
+
+    "peoples_movement_for_self_reliance": _pack(
+        [
+            "peoples movement for self reliance", "people's movement for self reliance",
+            "pmsr", "pmsr ngo", "karunalaya pmsr", "karunalaya residential school home",
+        ],
+        _row(
+            "The available programme description identifies Karunalaya as a residential school-home for approximately 40 children with intellectual disabilities and IMAGE as a separate education and livelihood-support programme for approximately 630 early-married adolescent girls across 43 villages. These are reach figures for two distinct cohorts, not progression outcomes. No named child, school completion, NIOS result, training completion, employment or independent-living destination was found. The official site timed out during review and no accessible official annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Official PMSR programmes page", "url": "http://pmsrngo.org/what-we-do"},
+                {"label": "Official PMSR website", "url": "http://pmsrngo.org/"},
+            ],
+        ),
+        _row(
+            "Karunalaya is described as combining functional academics, daily-living skills, vocational training and sport for children with intellectual disabilities. IMAGE is described as a village-based education and vocational pathway for early-married adolescent girls. The two models and cohorts must remain separate. Because the official site was inaccessible, class frequency, curriculum, assessment, staffing, transition planning and current operation could not be verified. No accessible official annual or substantive impact-report PDF was found.",
+            [
+                {"label": "Official PMSR programmes page", "url": "http://pmsrngo.org/what-we-do"},
+                {"label": "Official PMSR website", "url": "http://pmsrngo.org/"},
+            ],
+        ),
+        _row(
+            "Sport is mentioned for the Karunalaya children and vocational activity is described for both programme streams, but no recurring competition, public performance, exhibition, educational visit, leadership role, mentor pathway or child-led community project was documented. A generic sport or vocational label is not sufficient to establish a varied Development Environment. Residential care, food and therapy are baseline supports and are not counted here. The official site was inaccessible and no annual or substantive impact report could be reviewed.",
+            [
+                {"label": "Official PMSR programmes page", "url": "http://pmsrngo.org/what-we-do"},
+            ],
+        ),
+    ),
+
+    "reaching_hand": _pack(
+        [
+            "reaching hand", "reaching hand ngo", "reaching hand foundation",
+            "reaching hand new home", "lighthouse international academy reaching hand",
+        ],
+        _row(
+            "Reaching Hand's current website reports approximately 50 girls in New Home and 185 children at Lighthouse International Academy, while Namma Shaale supports government schools. These are separate cohorts and should not be merged. The reviewed official pages did not publish Class 10 or 12 results, college entry, named alumni, employment or independent-living outcomes for the children. The annual-reports page lists reports including 2024-25 and 2023-24, but the hosted report files were not reliably extractable during this review, so no unverified figures have been imported.",
+            [
+                {"label": "Official Reaching Hand website", "url": "https://reachinghand.org/"},
+                {"label": "Official annual-reports page", "url": "https://reachinghand.org/annual-report/"},
+            ],
+        ),
+        _row(
+            "Reaching Hand directly operates a children's home and Lighthouse International Academy and separately supports government schools through Namma Shaale. This establishes sustained school access across residential, direct-school and school-support settings. The public pages reviewed do not specify remedial design, level-based grouping, assessment, mentoring loads, transition preparation or learning gains, and the models must not be collapsed into one programme. Current annual reports are listed but could not be reliably parsed in this review.",
+            [
+                {"label": "Official Reaching Hand website", "url": "https://reachinghand.org/"},
+                {"label": "Official annual-reports page", "url": "https://reachinghand.org/annual-report/"},
+            ],
+        ),
+        _row(
+            "The public pages establish care and schooling but do not provide enough recurring evidence of arts or sport progression, external competitions, public performance, student governance, educational travel, professional exposure, child-led community projects or sustained external mentoring for the same child cohort. Photographs or isolated activities are not sufficient to demonstrate a varied Development Environment. Shelter, meals, healthcare and ordinary schooling are baseline provisions and are not counted here. The listed current annual reports were not reliably extractable.",
+            [
+                {"label": "Official Reaching Hand website", "url": "https://reachinghand.org/"},
+                {"label": "Official annual-reports page", "url": "https://reachinghand.org/annual-report/"},
+            ],
+        ),
+    ),
+
+    "saraswathi_education_trust": _pack(
+        [
+            "saraswathi education trust", "saraswati education trust",
+            "sssset", "saraswathi education trust karnataka", "sri sathya sai saraswathi education trust",
+        ],
+        _row(
+            "The official site reports three campuses and more than 650 children and is led by alumni, which suggests an enduring institutional pathway. It presents one named Grade 10 student, Tejas, whose singing ability developed into leadership of a bhajan group. The site does not publish systematic Class 10 or 12 results, college destinations, professional training, employment or cohort outcomes. Historical annual reports are listed only through 2020-21, so current progression evidence remains thin.",
+            [
+                {"label": "Official Saraswathi Education Trust website", "url": "https://www.sssset.org/"},
+            ],
+        ),
+        _row(
+            "The Trust describes free schooling across three campuses, academic tuition and an approach combining intellectual education with values and spiritual development. The official material does not set out current pedagogy, remedial or level-based instruction, assessment, mentoring, transition preparation or measured learning gains. Institutional scale does not by itself establish a differentiated learning model. The latest annual reports listed publicly are historical, ending in 2020-21.",
+            [
+                {"label": "Official Saraswathi Education Trust website", "url": "https://www.sssset.org/"},
+            ],
+        ),
+        _row(
+            "The named Tejas example provides one credible music and student-responsibility signal through leadership of a bhajan group. The website does not demonstrate a recurring and varied set of arts, sport, clubs, external competitions, educational visits, civic projects, public platforms or professional mentors across the child cohort. Spiritual or cultural instruction alone is not sufficient evidence of a broad Development Environment. Food, accommodation and routine care are baseline provisions and are not counted. The available annual reports are historical through 2020-21.",
+            [
+                {"label": "Official Saraswathi Education Trust website", "url": "https://www.sssset.org/"},
+            ],
+        ),
+    ),
+
+    "sewacb": _pack(
+        [
+            "sewacb", "sewac b", "sewac-b", "social educational welfare association for children bangalore",
+            "beehive montessori sewacb", "sewacb bangalore",
+        ],
+        _row(
+            "SEWAC-B's official Annual Report 2023-24 records 95 school children and 33 crèche children. It reports examinations, outgoing-child and parent counselling for admission to regular schools, and identifies Jennifer Das as its first scholar, then in the fourth semester of her degree. This is one concrete higher-education continuation example, but the report does not publish the number moving to regular school, examination results, retention, degree completion or employment. Adult women's training and employment figures in the same report belong to a separate cohort and are not child outcomes.",
+            [
+                {"label": "Official Annual Report 2023-24", "url": "https://www.sewacb.org/wp-content/uploads/2024/11/SEWAC-B-Report-2023-24-1.pdf"},
+                {"label": "Official reports page", "url": "https://www.sewacb.org/reports/"},
+            ],
+        ),
+        _row(
+            "The official report and programme pages describe a crèche, Montessori or preschool provision, a school programme and study support, with examinations and transition counselling for children entering regular schools. This gives a direct early-childhood and school-support pathway. The report does not publish curriculum detail, class frequency, teacher-child ratios, learner assessment, school-readiness gains or the number successfully admitted and retained in mainstream school. The 2023-24 annual report is the primary evidence and is more current than older website headcounts.",
+            [
+                {"label": "Official Annual Report 2023-24", "url": "https://www.sewacb.org/wp-content/uploads/2024/11/SEWAC-B-Report-2023-24-1.pdf"},
+                {"label": "Official SEWAC-B website", "url": "https://www.sewacb.org/"},
+            ],
+        ),
+        _row(
+            "The 2023-24 annual report documents a sports day, recitation, storytelling and drawing competitions, an annual-day platform and a picnic to Bal Bhavan. These provide varied sport, creative expression, public presentation and educational exposure. They appear primarily as periodic events rather than sustained progression pathways, and the report does not show child leadership or external mentors. Food, crèche care, healthcare and counselling are baseline or learning supports and are not counted here. Adult women's activities in the report must not be attributed to the children.",
+            [
+                {"label": "Official Annual Report 2023-24", "url": "https://www.sewacb.org/wp-content/uploads/2024/11/SEWAC-B-Report-2023-24-1.pdf"},
+            ],
+        ),
+    ),
+
+    "smile_foundation": _pack(
+        [
+            "smile foundation", "smile foundation india", "smile ngo",
+            "mission education smile foundation",
+        ],
+        _row(
+            "Smile Foundation's Annual Report 2024-25 reports national-scale reach, including approximately 185,000 children, work across 17 states and more than 1,000 government schools, along with 1,591 scholarships. The prior report gives different year-specific totals. These are national reach and assistance figures, not Karnataka child progression. The reviewed reports do not isolate Karnataka Class 10 or 12 completion, college destinations, named alumni or employment outcomes for the PM lead, so national figures must not be represented as local results.",
+            [
+                {"label": "Official Annual Report 2024-25", "url": "https://www.smilefoundationindia.org/imfact/2025/index.html"},
+                {"label": "Official annual-reports page", "url": "https://www.smilefoundationindia.org/annual-report/"},
+                {"label": "Official Annual Report 2023-24", "url": "https://www.smilefoundationindia.org/imfact/2024/index.html"},
+            ],
+        ),
+        _row(
+            "Mission Education operates through hundreds of centres and government-school partnerships and combines foundational learning, digital learning, teacher support, scholarships and other interventions. This establishes substantial national delivery, but not one uniform learning model: programme intensity, cohort, curriculum and assessment differ by site. The annual reports do not provide a Karnataka-specific programme architecture, frequency, learner-level gains or transition pathway for this assigned lead. National aggregate evidence should therefore be separated from local operational fit.",
+            [
+                {"label": "Official Annual Report 2024-25", "url": "https://www.smilefoundationindia.org/imfact/2025/index.html"},
+                {"label": "Official Mission Education page", "url": "https://www.smilefoundationindia.org/education/"},
+            ],
+        ),
+        _row(
+            "Smile's national work includes exposure and participation initiatives, but the reviewed annual reports do not establish a recurring, varied Development Environment for a defined Karnataka child cohort. Child for Child largely sensitises comparatively privileged schoolchildren and should not automatically be attributed to the same underserved Mission Education beneficiaries. No Karnataka-specific evidence was found on sustained arts or sport, external competitions, student governance, educational visits, public performance or community leadership. Meals, healthcare and scholarships are not counted as Development Environment evidence.",
+            [
+                {"label": "Official Annual Report 2024-25", "url": "https://www.smilefoundationindia.org/imfact/2025/index.html"},
+                {"label": "Official annual-reports page", "url": "https://www.smilefoundationindia.org/annual-report/"},
+            ],
+        ),
+    ),
+
+    "snehashraya_foundation": _pack(
+        [
+            "snehashraya foundation", "sneha shraya foundation", "snehashraya foundation bangalore",
+            "snehashraya foundation bengaluru",
+        ],
+        _row(
+            "The official website refers to education sponsorship and support for underprivileged children, youth and other groups but does not publish a named learner, school return, grade completion, examination result, college destination, training completion or employment outcome. The organisation works across several social sectors, making the size and continuity of the child cohort unclear. No official annual or substantive impact-report PDF was located, and no child progression can be substantiated from the current public material.",
+            [
+                {"label": "Official Snehashraya Foundation website", "url": "https://snehashrayafoundation.org/"},
+            ],
+        ),
+        _row(
+            "Education sponsorship, career guidance and broad support are listed, but the website does not identify an operating school or learning centre, curriculum, teacher, class frequency, assessment, mentoring structure, participant count or transition process. Generic programme categories are not enough to establish a structured Learning Model. No official annual or substantive impact-report PDF was found, and current programme delivery requires direct verification.",
+            [
+                {"label": "Official Snehashraya Foundation website", "url": "https://snehashrayafoundation.org/"},
+            ],
+        ),
+        _row(
+            "The website lists sports, arts and culture among several fields of work, but it does not document a defined child cohort, recurring schedule, competitions, public performances, educational visits, leadership, professional mentors or child-led community projects. Generic categories and galleries are not sufficient evidence of a varied Development Environment. Food, healthcare, counselling and sponsorship are baseline or pathway supports and are not counted here. No official annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Official Snehashraya Foundation website", "url": "https://snehashrayafoundation.org/"},
+            ],
+        ),
+    ),
+
+    "akhila_bharatha_kuruhina_setty_vidyarthini_nilaya_trust": _pack(
+        [
+            "akhila bharatha kuruhina setty nekara vidyarthini nilaya charitable trust",
+            "akhila bharatha kuruhina setty vidyarthini nilaya charitable trust",
+            "kuruhina setty vidyarthini nilaya charitable trust", "nekara vidyarthini nilaya",
+            "kuruhina vidyarthini trust", "kuruhinavidyarthini",
+        ],
+        _row(
+            "The official site describes college-fee support and scholarships for economically disadvantaged girls and a proposed hostel intended to enable higher education. It does not publish the number of current scholars, degree completion, colleges or courses, named former students, employment or repeated cohort outcomes. A free 60-place hostel was described as under construction in April 2025, and a later inauguration was scheduled; a scheduled event is not proof of current operation. No official annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Official Trust website", "url": "https://kuruhinavidyarthini.org/"},
+                {"label": "Official projects page", "url": "https://kuruhinavidyarthini.org/projects.php"},
+                {"label": "Official proposed girls-hostel page", "url": "https://kuruhinavidyarthini.org/girlshostel.php"},
+            ],
+        ),
+        _row(
+            "The Trust's evidenced model is primarily financial and accommodation support for girls pursuing higher education, with library and training ideas also mentioned. It does not document direct teaching, remedial instruction, assessment, mentoring frequency, transition preparation or a delivered hostel learning programme. Scholarships and a proposed hostel improve access but do not by themselves constitute a differentiated Learning Model. No official annual or substantive impact-report PDF was found.",
+            [
+                {"label": "Official projects page", "url": "https://kuruhinavidyarthini.org/projects.php"},
+                {"label": "Official proposed girls-hostel page", "url": "https://kuruhinavidyarthini.org/girlshostel.php"},
+            ],
+        ),
+        _row(
+            "A library and training are mentioned as intended support, but the public site does not show recurring clubs, arts or sport, external competitions, public presentation, educational visits, professional exposure, student leadership or community projects for a current cohort. The proposed hostel and accommodation are baseline access provisions and are not counted as Development Environment evidence. No official annual or substantive impact-report PDF was located, and prospective facilities must not be presented as delivered opportunities.",
+            [
+                {"label": "Official projects page", "url": "https://kuruhinavidyarthini.org/projects.php"},
+                {"label": "Official proposed girls-hostel page", "url": "https://kuruhinavidyarthini.org/girlshostel.php"},
+            ],
+        ),
+    ),
+
+    "asha_charitable_trust": _pack(
+        [
+            "asha charitable trust", "asha trust", "asha charitable trust karnataka",
+            "asha evening tuition centres", "asha evening tuition centers",
+        ],
+        _row(
+            "ASHA's official programme page reports approximately 30 evening tuition centres serving around 600 economically disadvantaged school-going children. This establishes scale and continued school participation, but no Class 10 or 12 results, school-retention rate, college destination, scholarship selection, named alumnus or employment outcome is published on the reviewed pages. The official annual-reports page was located, but its report files were not reliably extractable during this review, so no additional outcome has been claimed from them.",
+            [
+                {"label": "Official what-we-do page", "url": "https://ashatrust.org.in/what-we-do"},
+                {"label": "Official annual-reports page", "url": "https://ashatrust.org.in/annual-reports"},
+            ],
+        ),
+        _row(
+            "ASHA operates a recurring after-school model through 30 rural and semi-urban evening tuition centres and also describes school materials, mentoring and skill support. This is more structured than one-off distribution, but the public material does not state days per week, hours, curriculum, teacher qualifications, level grouping, attendance, assessment or measured learning gains. The annual-reports page was checked, but the underlying reports could not be reliably parsed in this review.",
+            [
+                {"label": "Official what-we-do page", "url": "https://ashatrust.org.in/what-we-do"},
+                {"label": "Official annual-reports page", "url": "https://ashatrust.org.in/annual-reports"},
+            ],
+        ),
+        _row(
+            "The official pages mention mentoring and skill building, but they do not demonstrate a recurring and varied child opportunity programme involving organised arts or sport, external competitions, public performance, educational visits, student leadership, professional exposure or child-led community projects. Generic mentoring is not sufficient without frequency or content. School materials and financial assistance are access supports and are not counted here. The listed annual reports were not reliably extractable.",
+            [
+                {"label": "Official what-we-do page", "url": "https://ashatrust.org.in/what-we-do"},
+                {"label": "Official annual-reports page", "url": "https://ashatrust.org.in/annual-reports"},
+            ],
+        ),
+    ),
+
+    "ashwini_charitable_trust": _pack(
+        [
+            "ashwini charitable trust", "ashwini charitable trust act", "act ashwini charitable trust",
+            "ashwini trust bengaluru", "ashwini trust bangalore",
+        ],
+        _row(
+            "The official Annual Report 2023-24 records 304 students across in-school and after-school programmes and gives named progression examples. Revathi and Jamuna are reported to have completed graduation and secured jobs; Kasturi passed Class 10 and graduated in 2023; and John Peter completed a B.Com and was preparing for corporate work. The report also lists employers associated with alumni, including major banks and technology companies, but gives no denominator, cohort year or placement rate. These are credible named outcomes, not a complete outcome system. The assignment description of ACT as a residential children's home is not supported by the official report; ACT is a learning-centre and school-support organisation.",
+            [
+                {"label": "Official Annual Report 2023-24", "url": "https://static1.squarespace.com/static/5f742fb44cb318543177418c/t/67b591f6d0a40a4e02ff2a5c/1739952735607/ACT%2BAnnual%2BReport%2B2023-24_compressed%2Bas%2B16th%2BFeb%2B2025.pdf"},
+                {"label": "Official annual-report page", "url": "https://www.ashwinitrust.org/annual-report"},
+            ],
+        ),
+        _row(
+            "ACT's 2023-24 annual report describes individual academic assessment, in-school and after-school mentoring, literacy and numeracy pathways with regular assessment, LSRW-based language development, science partnerships, computer literacy, robotics and Scratch, professional mentoring and life-skills sessions. It reports 41 senior mentors trained, 255 life-skills sessions for 82 students and structured science and technology exposure. This is a layered and individualised learning model. The report does not publish subject-level pre/post gains, attendance, attrition or progression rates for the full cohort.",
+            [
+                {"label": "Official Annual Report 2023-24", "url": "https://static1.squarespace.com/static/5f742fb44cb318543177418c/t/67b591f6d0a40a4e02ff2a5c/1739952735607/ACT%2BAnnual%2BReport%2B2023-24_compressed%2Bas%2B16th%2BFeb%2B2025.pdf"},
+                {"label": "Official Ashwini Trust website", "url": "https://www.ashwinitrust.org/"},
+            ],
+        ),
+        _row(
+            "The 2023-24 report demonstrates substantial variety: 76 karate sessions for 64 students; 125 singing and guitar classes for more than 70 children; photography and art workshops culminating in an exhibition; museum engagement; Annual Day performance; trips and treks; cricket; robotics presentations and Mega Robo War; senior students mentoring juniors; and corporate career interactions. These provide sustained sport, arts, creative production, public presentation, educational exposure, leadership and professional contact. Activities involve different age groups and not every student receives every opportunity. Food, health and counselling are not counted here, and ACT should not be mislabelled as a residential home.",
+            [
+                {"label": "Official Annual Report 2023-24", "url": "https://static1.squarespace.com/static/5f742fb44cb318543177418c/t/67b591f6d0a40a4e02ff2a5c/1739952735607/ACT%2BAnnual%2BReport%2B2023-24_compressed%2Bas%2B16th%2BFeb%2B2025.pdf"},
+            ],
+        ),
+    ),
+
+    "bhavan_bangalore_press_educational_trust": _pack(
+        [
+            "bhavan bangalore press educational trust", "bhavan bangalore press school",
+            "bangalore press educational trust", "bhavan's bangalore press school",
+            "bhavans bangalore press school",
+        ],
+        _row(
+            "The official school site states that the Trust established the school in 2010 in Chamarajpet to serve children from economically weaker and lower-income communities. It provides a board-results page, but the embedded result document was not reliably extractable during this review and no named alumni, college destinations or employment outcomes were found. An older about-page enrolment figure is historical and should not be treated as current. No official annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Official about page", "url": "https://www.bhavanbangalorepressschool.com/about-us"},
+                {"label": "Official board-results page", "url": "https://www.bhavanbangalorepressschool.com/cbse-mandates/last-three-year-result-of-the-board-examination"},
+            ],
+        ),
+        _row(
+            "The official curriculum page describes NCERT and NCF-aligned teaching with activity and practical emphasis and continuous evaluation through class activity, homework, group work, projects, reading, comprehension, assemblies and behaviour, alongside formal assessments across two terms. This is a reasonably articulated mainstream school model. The public pages do not show level-based remediation, individual mentoring, transition preparation, current learner outcomes or whether the model varies by grade. No official annual or substantive impact-report PDF was found. The school is fee-structured, and the public mission to serve lower-income children does not prove that every place is free.",
+            [
+                {"label": "Official curriculum page", "url": "https://www.bhavanbangalorepressschool.com/academics/curriculum"},
+                {"label": "Official about page", "url": "https://www.bhavanbangalorepressschool.com/about-us"},
+            ],
+        ),
+        _row(
+            "The school documents broad participation in Cubs, Bulbuls, Scouts and Guides, with teamwork and leadership objectives; inter-house and external sport; and student achievements in badminton, throwball, athletics, long jump, shot put, dancing, singing, debate, recitation, speech, patriotic singing, spelling and abacus. These provide varied sport, arts, public competition and responsibility beyond ordinary lessons. The activity pages appear largely undated, so current continuity and the proportion of students participating require verification. Ordinary schooling and infrastructure are not counted separately. No official annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Official Scouts and Guides page", "url": "https://www.bhavanbangalorepressschool.com/activities/scouts-and-guides"},
+                {"label": "Official student-achievements page", "url": "https://www.bhavanbangalorepressschool.com/activities/students-achievements"},
+                {"label": "Official sports page", "url": "https://www.bhavanbangalorepressschool.com/activities/sports"},
+            ],
+        ),
+    ),
+
+
+    "christ_international_ministries": _pack(
+        [
+            "christ international ministries", "christ international ministries trust",
+            "cim trust", "cim new india", "christ international ministry",
+        ],
+        _row(
+            "The official website gives one named participation signal: a girl is described as having attended the after-school programme for three years and continuing in Grade 7. This supports continuity for one learner, but it is not evidence of grade completion, examination success or an alumni destination. No cohort-level retention, Class 10 or 12 completion, college entry, scholarship, employment or former-participant outcome was found. An official Annual Report 2023-24 page was located, but its linked PDF could not be reliably accessed during review; no result has therefore been inferred from the report listing.",
+            [
+                {"label": "Official Annual Report 2023-24 listing", "url": "https://cimnewindia.org/annual-report-2023-2024/"},
+                {"label": "Official CIM website", "url": "https://cimnewindia.org/"},
+            ],
+        ),
+        _row(
+            "CIM describes a recurring after-school programme combining homework and remedial support with computer education for Grades 5-8, spoken English and teaching assistance in low-income government schools. This establishes a direct learning intervention rather than material distribution alone. The public pages do not state programme frequency, duration, curriculum sequence, learner grouping, attendance, assessment, measured gains or transition preparation, and the claim that teacher-student ratios improve outcomes is not accompanied by data. The Annual Report 2023-24 PDF was listed but not reliably accessible.",
+            [
+                {"label": "Official education programme", "url": "https://cimnewindia.org/education/"},
+                {"label": "Official Annual Report 2023-24 listing", "url": "https://cimnewindia.org/annual-report-2023-2024/"},
+            ],
+        ),
+        _row(
+            "The official programme page demonstrates varied opportunities beyond tutoring: sports and recreation; art, music, crafts and games; cultural activities; unstructured play; volunteer work and community service; and educational trips intended to build practical knowledge, teamwork and cultural awareness. This is meaningful breadth, but no participation counts, cadence, child outputs, competitions, public performances or leadership progression are published. Nutrition, school kits and health checks are baseline supports and are not counted as Development Environment evidence. The listed Annual Report 2023-24 PDF could not be reliably reviewed.",
+            [
+                {"label": "Official education programme", "url": "https://cimnewindia.org/education/"},
+                {"label": "Official healthcare and trip information", "url": "https://cimnewindia.org/healthcare/"},
+                {"label": "Official Annual Report 2023-24 listing", "url": "https://cimnewindia.org/annual-report-2023-2024/"},
+            ],
+        ),
+    ),
+
+    "cry_child_rights_and_you": _pack(
+        [
+            "cry", "child rights and you", "cry child rights and you",
+            "cry india", "cry open school", "cry open school programme",
+        ],
+        _row(
+            "CRY's official 2024-25 annual report reports national-scale education reach and states that 95% of children aged 6-18 in CRY project areas were in school. The current website reports a 2025-26 national figure of 91%. These are organisation-wide aggregates across many projects and states and cannot be treated as outcomes for the Karnataka open-school cohort in this assignment. The specific open-school page confirms a pathway for dropouts to continue education and sit open-school examinations, but publishes no enrolment denominator, exam appearance, pass rate, completion rate, re-entry rate or destination data for that programme.",
+            [
+                {"label": "Official Annual Report 2024-25", "url": "https://www.cry.org/downloads/annual-reports/CRY-Annual-Report-2024-25.pdf"},
+                {"label": "Official open-school campaign", "url": "https://www.cry.org/sponsor-education-for-school-dropouts/"},
+            ],
+        ),
+        _row(
+            "The open-school intervention identifies children who have dropped out, informs families about the open-school route and provides academic and counselling support so children can study and appear for examinations. This is a defined continuation pathway for children unable to return to formal school. The public page does not identify implementing partners or Karnataka locations, teaching schedule, subjects, curriculum, tutor qualifications, assessment, attendance or transition follow-up. The annual report evidence is national and must not be used to fill these programme-specific gaps.",
+            [
+                {"label": "Official open-school campaign", "url": "https://www.cry.org/sponsor-education-for-school-dropouts/"},
+                {"label": "Official Annual Report 2024-25", "url": "https://www.cry.org/downloads/annual-reports/CRY-Annual-Report-2024-25.pdf"},
+            ],
+        ),
+        _row(
+            "The open-school page explicitly includes storytelling, singing and dancing to sustain motivation, and children's collectives intended to build agency and confidence. These are relevant creative-expression and child-participation opportunities, but the page does not establish frequency, outputs, public platforms, leadership roles or whether the activities are delivered to the Karnataka cohort. National annual-report examples in sport, STEM or life skills come from CRY's wider portfolio and are not attributed automatically to this programme. Counselling and nutrition outcomes are not counted as Development Environment evidence.",
+            [
+                {"label": "Official open-school campaign", "url": "https://www.cry.org/sponsor-education-for-school-dropouts/"},
+                {"label": "Official Annual Report 2024-25", "url": "https://www.cry.org/downloads/annual-reports/CRY-Annual-Report-2024-25.pdf"},
+            ],
+        ),
+    ),
+
+    "don_bosco_gulbarga": _pack(
+        [
+            "don bosco gulbarga", "don bosco gulbarga salesian province bangalore ink",
+            "don bosco pyar", "don bosco pyar gulbarga", "pyar gulbarga",
+            "don bosco gulbarga pyar", "salesian province bangalore don bosco gulbarga",
+        ],
+        _row(
+            "An official Don Bosco PYaR account documents a concrete transition: after advocacy with families and authorities, all 40 children identified in brick-making units were admitted to Government Higher Primary School, Babalad. A separate 2025 province article reports 20 children rescued by PYaR Gulbarga during an anti-child-labour campaign; rescue is not itself an education outcome. No later retention, attendance, grade progression, examination, college, vocational or employment destination is reported for the 40 mainstreamed children. No current organisation-specific annual or substantive impact report was located.",
+            [
+                {"label": "Official mainstream-school readmission account", "url": "https://dbbangalore.org/advocacy-for-readmitting-children-from-the-brick-making-units-to-mainstream-schools-by-don-bosco-pyar-gulbarga/"},
+                {"label": "Official Don Bosco Gulbarga profile", "url": "https://dbbangalore.org/don-bosco-gulbarga/"},
+                {"label": "Official 2025 child-labour campaign account", "url": "https://dbbangalore.org/crack-down-on-child-labour-rescues-several-children-in-karnataka/"},
+            ],
+        ),
+        _row(
+            "The official profile describes a transition centre, non-formal education, evening tuition centres and rehabilitation for child labourers, school dropouts and street-connected children, with a stated aim of moving children towards mainstream education and society. The documented readmission effort shows active case follow-up rather than passive referral. Public material does not explain the current curriculum, daily or weekly dosage, learner assessment, remedial method, school liaison after admission, age distribution or transition preparation. No current annual or substantive impact report was found.",
+            [
+                {"label": "Official Don Bosco Gulbarga profile", "url": "https://dbbangalore.org/don-bosco-gulbarga/"},
+                {"label": "Official mainstream-school readmission account", "url": "https://dbbangalore.org/advocacy-for-readmitting-children-from-the-brick-making-units-to-mainstream-schools-by-don-bosco-pyar-gulbarga/"},
+            ],
+        ),
+        _row(
+            "Official event reporting shows children participating in child-rights clubs, a publicly presented skit on child labour and dance and drawing competitions involving children from government schools after a month of preparation. These provide civic awareness, creative production, public performance and competition opportunities. The pages do not establish how frequently the same rehabilitation cohort receives these opportunities or what roles children hold within the clubs. Shelter, psychosocial support, recreation and meals are not counted by themselves. Evidence is specific to Don Bosco PYaR Gulbarga and must not be merged with BOSCO Bengaluru or the Davangere Child Labour Mission. No annual report was located.",
+            [
+                {"label": "Official child-rights day account", "url": "https://dbbangalore.org/international-child-rights-day-celebrated-at-don-bosco-gulbarga/"},
+                {"label": "Official child-labour skit account", "url": "https://dbbangalore.org/don-bosco-pyar-gulbarga-honoured-for-efforts-in-child-rescue-and-rehabilitation/"},
+                {"label": "Official Don Bosco Gulbarga profile", "url": "https://dbbangalore.org/don-bosco-gulbarga/"},
+            ],
+        ),
+    ),
+
+    "indivillage_foundation": _pack(
+        [
+            "indivillage foundation", "indi village foundation", "indivillage",
+            "indivillage foundation india", "indi village",
+        ],
+        _row(
+            "The official Annual Impact Report 2023-24 provides assessed learning results rather than long-term destinations. In Tech Her Forward, 5,587 girls across 53 schools and eight locations participated; comfort using computers increased from 57% to 68%, programming knowledge from 44% to 57% and awareness of ChatGPT from 10% to 36%. Storytelling Saturday reported 3,567 participants across 29 schools and 27.72% showing notable progress in speaking. These are multi-location programme results and are not all Karnataka-specific. No Class 10 or 12 completion, college entry, scholarship, employment or alumni destination system was reported for the child cohorts.",
+            [
+                {"label": "Official Annual Impact Report 2023-24", "url": "https://www.indivillagefoundation.org/wp-content/uploads/2024/05/Annual-Impact-Report-2023-24.pdf"},
+                {"label": "Official impact page", "url": "https://www.indivillagefoundation.org/our-impact/"},
+            ],
+        ),
+        _row(
+            "The 2023-24 report describes a structured eight-month, 32-session Tech Her Forward course followed by a three-month, 12-session extension, with baseline and endline assessment. It also documents a 12-session-plan storytelling programme, computer laboratories, internet-enabled schools and mini-libraries, including activity in Raichur. Participant testimony refers to Scratch, animated stories, email and presentation skills. This is a sequenced, applied and measured learning model. Results should remain separated by programme and geography, and the youth-skilling programme for adults is not counted as a child-learning outcome.",
+            [
+                {"label": "Official Annual Impact Report 2023-24", "url": "https://www.indivillagefoundation.org/wp-content/uploads/2024/05/Annual-Impact-Report-2023-24.pdf"},
+                {"label": "Official impact page", "url": "https://www.indivillagefoundation.org/our-impact/"},
+            ],
+        ),
+        _row(
+            "The report documents children producing animated stories and presentations, taking part in an annual showcase and, in some locations, structured Saturday art sessions. These are creative-production and public-presentation opportunities beyond routine tuition. The report does not demonstrate a consistent package of sport, leadership, educational visits, professional mentoring or civic projects across all participating schools, and the art cohort cannot be assumed to be the Karnataka cohort. Digital infrastructure and libraries support learning but are not counted separately as Development Environment. The latest substantive official report located was for 2023-24.",
+            [
+                {"label": "Official Annual Impact Report 2023-24", "url": "https://www.indivillagefoundation.org/wp-content/uploads/2024/05/Annual-Impact-Report-2023-24.pdf"},
+                {"label": "Official impact page", "url": "https://www.indivillagefoundation.org/our-impact/"},
+            ],
+        ),
+    ),
+
+    "samiksha_foundation": _pack(
+        [
+            "samiksha foundation", "samiksha foundation caring for children with cancer trust",
+            "samiksha foundation caring for children with cancer", "caring for children with cancer trust",
+            "samiksha caring for children with cancer",
+        ],
+        _row(
+            "Samiksha's official 2024-25 annual report and current programme synthesis document substantial progression. The Foundation reports 15,706 students reached from 2009 to 2025, 527 scholarships cumulatively, more than 35 alumni pursuing professional courses, 11 alumni employed and at least two working as paramedical technicians. Scholarship totals are awards across years rather than a denominator of unique children, and no cohort completion or placement rate is provided. These outcomes are directly relevant to children whose schooling was disrupted by cancer treatment, but the figures should not be read as results for every hospital centre.",
+            [
+                {"label": "Official Annual Report 2024-25", "url": "https://samikshafoundation.org/reports/samiksha-foundation-annual-report-2024-25.pdf"},
+                {"label": "Official 2009-2025 programme synthesis", "url": "https://samikshafoundation.org/updates/2025-10-10-on-the-need-for-nonmedical-pediatric-oncology-services-in-india/"},
+                {"label": "Official scholarship programme", "url": "https://samikshafoundation.org/programs/scholarship/"},
+            ],
+        ),
+        _row(
+            "The official education programme provides individualised, hospital-based and remote teaching designed around treatment schedules, with one-to-one digital support and continuity across six Bengaluru hospitals. A programme coordinator describes a weekly pattern with academic sessions alongside structured creative sessions, and the Foundation maintains educational records and scholarship support for reintegration. This is a tailored continuity model rather than ordinary classroom delivery. Public evidence does not provide subject-level gains, attendance, time-to-reintegration, examination pass rates or a comparison group. The 2024-25 annual report was reviewed alongside current official programme pages.",
+            [
+                {"label": "Official education programme", "url": "https://samikshafoundation.org/programs/education/"},
+                {"label": "Official Annual Report 2024-25", "url": "https://samikshafoundation.org/reports/samiksha-foundation-annual-report-2024-25.pdf"},
+                {"label": "Official programme synthesis", "url": "https://samikshafoundation.org/updates/2025-10-10-on-the-need-for-nonmedical-pediatric-oncology-services-in-india/"},
+            ],
+        ),
+        _row(
+            "Children have access to a multilingual library, storytelling, drawing, crafts, yoga, meditation and milestone celebrations, with some sessions embedded in the weekly hospital schedule. This demonstrates recurring creative expression and shared celebration in an otherwise highly restricted treatment environment. The activities are not documented as competition, public performance, child leadership or external educational exposure, and creative therapy should not be confused with evidence of wider social progression. Medical treatment, counselling and hospital support are not counted as Development Environment evidence. The official 2024-25 annual report was reviewed.",
+            [
+                {"label": "Official programme synthesis", "url": "https://samikshafoundation.org/updates/2025-10-10-on-the-need-for-nonmedical-pediatric-oncology-services-in-india/"},
+                {"label": "Official education programme", "url": "https://samikshafoundation.org/programs/education/"},
+                {"label": "Official Annual Report 2024-25", "url": "https://samikshafoundation.org/reports/samiksha-foundation-annual-report-2024-25.pdf"},
+            ],
+        ),
+    ),
+
+    "sevalaya_charitable_trust_bengaluru": _pack(
+        [
+            "sevalaya charitable trust", "sevalaya charitable trust bengaluru",
+            "sevalaya charitable trust bangalore", "sevalaya india charitable trust",
+            "sevalaya india", "sevalayaindia",
+        ],
+        _row(
+            "The Bengaluru organisation's website claims a free residential school and very large cumulative reach figures, including children 'saved', but the reviewed pages provide no methodology, dates, cohort definitions, named learners or education destinations. Site counters and surrounding copy are internally inconsistent, so the quantitative claims are not treated as verified outcomes. No official annual or substantive impact-report PDF was located for this sevalayaindia.org entity. It must not be confused with the separate Chennai-based Sevalaya organisation at sevalaya.org, whose annual reports are not evidence for this assignment.",
+            [
+                {"label": "Official Bengaluru Sevalaya website", "url": "https://sevalayaindia.org/"},
+                {"label": "Official child-education page", "url": "https://sevalayaindia.org/child-education/"},
+            ],
+        ),
+        _row(
+            "The child-education page uses broad language about free education, critical thinking, creativity, problem-solving, extracurricular activity and mentorship. It does not identify a school name or location, beneficiary count, grades, curriculum, timetable, teachers, assessment, remedial approach, attendance, fee policy or demonstrated learning result. These statements are therefore treated as programme claims rather than an evidenced learning model. No organisation-specific annual or impact report was found for the Bengaluru entity.",
+            [
+                {"label": "Official child-education page", "url": "https://sevalayaindia.org/child-education/"},
+                {"label": "Official objectives page", "url": "https://sevalayaindia.org/our-objectives/"},
+                {"label": "Official Bengaluru Sevalaya website", "url": "https://sevalayaindia.org/"},
+            ],
+        ),
+        _row(
+            "The website mentions extracurricular sports and arts in generic terms, but it does not demonstrate a current recurring programme, participating children, competitions, public performance, creative outputs, educational visits, external mentors, leadership or civic projects. The generic wording is not sufficient to establish a varied Development Environment. Residential care, food, health and infrastructure are baseline supports and are not counted here. No official annual or substantive impact report was located, and evidence from the unrelated Chennai organisation must not be attributed to this entity.",
+            [
+                {"label": "Official child-education page", "url": "https://sevalayaindia.org/child-education/"},
+                {"label": "Official Bengaluru Sevalaya website", "url": "https://sevalayaindia.org/"},
+            ],
+        ),
+    ),
+
+    "shristi_special_academy": _pack(
+        [
+            "shristi special academy", "srishti special academy", "shristi academy",
+            "srishti academy special school", "shristi special school",
+        ],
+        _row(
+            "Official success stories show several named functional and vocational transitions. Dinal cleared NIOS subjects and later worked as an assistant teacher; Rangaswamy developed office and pre-vocational skills; and other learners progressed in communication, self-care, literacy or work routines. Karishma's art studio, exhibitions and self-advocacy are notable, but her trajectory involved multiple external providers and should not be attributed solely to Shristi. The stories demonstrate individual progression, not a cohort completion, mainstreaming, employment or independent-living rate. No official annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Official success stories", "url": "https://shristispecialacademy.com/success-stories/"},
+                {"label": "Official Shristi website", "url": "https://shristispecialacademy.com/"},
+            ],
+        ),
+        _row(
+            "Shristi documents a staged, individualised model: an inclusive preschool using an AARAMBH-UNICEF-approved curriculum; specialised autism and disability programmes; augmentative and alternative communication; functional academics and life skills; systematic pre-vocational and vocational preparation; and Sadhana on-the-job work with a nominal stipend. Learners who make sufficient progress may move into regular schools. This is a coherent progression pathway supported by multidisciplinary inputs. The public pages do not provide cohort sizes by programme, assessment results, mainstreaming rates, vocational placement rates or recent annual-report validation.",
+            [
+                {"label": "Official programmes", "url": "https://shristispecialacademy.com/programmes/"},
+                {"label": "Official success stories", "url": "https://shristispecialacademy.com/success-stories/"},
+            ],
+        ),
+        _row(
+            "The official pages and named stories demonstrate art classes, theatre, 10-kilometre running, Special Olympics participation, public exhibitions and performance-based expression. These provide sport, arts, public presentation and achievement pathways beyond classroom and therapy. Participation is not quantified across the full student body, dates are inconsistent across stories and some outcomes involved other organisations, so the opportunities cannot be assumed to reach every learner. Therapy and routine care are not counted by themselves. No official annual or substantive impact report was found.",
+            [
+                {"label": "Official programmes", "url": "https://shristispecialacademy.com/programmes/"},
+                {"label": "Official success stories", "url": "https://shristispecialacademy.com/success-stories/"},
+                {"label": "Official Shristi website", "url": "https://shristispecialacademy.com/"},
+            ],
+        ),
+    ),
+
+    "sri_sai_spiritual_centre_trust": _pack(
+        [
+            "sri sai spiritual centre trust", "sri sai spiritual center trust",
+            "sri sai spiritual centre", "sri sai spiritual center",
+            "sai spiritual centre trust", "sai vidya sri sai spiritual centre",
+        ],
+        _row(
+            "Sai Vidya states that poor students are supported from primary school through graduation through uniforms, shoes, educational aids and, for some, school or college fees. This describes an access pathway but provides no number of supported students, duration of support, completion, examination, college-entry, scholarship, employment or named alumnus outcome. Sai Prasada separately claims midday meals for more than 8,000 schoolchildren daily; nutrition reach is not educational progression. No organisation-specific annual or substantive impact report was located, and reports from other Sathya Sai institutions are not attributable to this Trust.",
+            [
+                {"label": "Official Sai Vidya page", "url": "https://srisaispiritualcentre.org/donations/%E2%81%A0sai-vidya/"},
+                {"label": "Official Sai Prasada page", "url": "https://srisaispiritualcentre.org/donations/sai-prasada/"},
+            ],
+        ),
+        _row(
+            "The documented education intervention consists primarily of uniforms, shoes, educational aids and limited fee assistance. These inputs may remove access barriers, but the reviewed pages do not show direct teaching, tutoring, mentoring, curriculum, assessment, learning support, attendance monitoring or transition preparation. The phrase 'value-integrated education' appears in the Trust description without an explained delivery model. No organisation-specific annual or impact report was found.",
+            [
+                {"label": "Official Sai Vidya page", "url": "https://srisaispiritualcentre.org/donations/%E2%81%A0sai-vidya/"},
+                {"label": "Official Trust website", "url": "https://srisaispiritualcentre.org/"},
+            ],
+        ),
+        _row(
+            "No official evidence was found of beneficiary students receiving recurring arts, sport, competitions, public performance, educational visits, professional exposure, student leadership or child-led civic projects through Sai Vidya. Religious and centre-wide events cannot automatically be attributed to the supported student cohort. Midday meals, uniforms, fee support and healthcare are baseline access supports and are not counted as Development Environment evidence. No organisation-specific annual or substantive impact report was located.",
+            [
+                {"label": "Official Sai Vidya page", "url": "https://srisaispiritualcentre.org/donations/%E2%81%A0sai-vidya/"},
+                {"label": "Official Trust website", "url": "https://srisaispiritualcentre.org/"},
+            ],
+        ),
+    ),
+
+    "vidyaranya": _pack(
+        [
+            "vidyaranya", "vidyaranya trust", "vidyaranya bengaluru",
+            "vidyaranya bangalore", "vidyaranya ngo",
+        ],
+        _row(
+            "Vidyaranya's official Annual Report 2024-25 records 50 girls at Namma Mane and 112 learners in its residential school for specially abled children. It provides one named vocational progression example: Kavya, a young adult with autism, learned basic computer and data-entry skills and began earning. The report does not publish school-completion, mainstreaming, examination, college, job-placement or independent-living rates for either child programme. Monthly parent meetings to discuss progress are a monitoring process, not an outcome. Evidence from the organisation's women, senior-care and livelihood programmes is not assigned to the child cohort.",
+            [
+                {"label": "Official Annual Report 2024-25", "url": "https://www.vidyaranya.org/_files/ugd/a4b845_e3332c33fab14ba1a50d0bd5fb24f3e0.pdf"},
+                {"label": "Official annual-reports archive", "url": "https://www.vidyaranya.org/annual-reports"},
+            ],
+        ),
+        _row(
+            "The 2024-25 report describes a residential special-school pathway alongside Namma Mane's education and care for girls. Child-focused activities include life-skills and motor-skills development, weekly computer sessions and parent progress meetings. This indicates ongoing support and some functional and digital learning, but the public report does not explain an academic curriculum, individual education-plan framework, assessment tools, remedial method, teaching dosage or transition criteria. The named data-entry outcome shows one applied pathway rather than a systematic model result.",
+            [
+                {"label": "Official Annual Report 2024-25", "url": "https://www.vidyaranya.org/_files/ugd/a4b845_e3332c33fab14ba1a50d0bd5fb24f3e0.pdf"},
+                {"label": "Official education and child-care pages", "url": "https://www.vidyaranya.org/annual-reports"},
+            ],
+        ),
+        _row(
+            "The 2024-25 report did not demonstrate a varied recurring child opportunity system involving organised arts or sport, competitions, public performance, educational visits, external mentors, leadership or child-led community projects. Annual trips, sports and yoga described for senior-care residents are not attributed to children. Weekly computer activity belongs to the Learning Model and is not double-counted as Development Environment. Food, shelter and residential care are baseline supports and are not counted here. The official annual report was reviewed.",
+            [
+                {"label": "Official Annual Report 2024-25", "url": "https://www.vidyaranya.org/_files/ugd/a4b845_e3332c33fab14ba1a50d0bd5fb24f3e0.pdf"},
+                {"label": "Official annual-reports archive", "url": "https://www.vidyaranya.org/annual-reports"},
+            ],
+        ),
+    ),
+
+    "vijetha_residential_special_school": _pack(
+        [
+            "vijetha residential special school", "vijetha special school",
+            "shri gururaghavendra seva trust", "sri gururaghavendra seva trust",
+            "gururaghavendra seva trust vijetha",
+        ],
+        _row(
+            "The official site reports that Vijetha serves 145 students with intellectual disabilities, including 36 orphans, and that 100 children reside in the hostel. These figures establish institutional scale, not child progression. No named learner outcome, school transition, NIOS or board result, vocational placement, employment, independent-living outcome or repeated cohort destination was found. Awards received by the school or founder are organisational recognitions and are not learner outcomes. No official annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Official about page", "url": "https://vijethas.com/about-us"},
+            ],
+        ),
+        _row(
+            "Vijetha describes free special education with individualised attention, physiotherapy, occupational and speech therapy, yoga, computer literacy, vocational training and life-skill development delivered by 35 teaching and non-teaching staff. This indicates a multidisciplinary and functional learning model with a vocational component. The public page does not provide curriculum, individual education-plan process, assessment, teaching frequency, progress measures, vocational trades, work exposure or transition criteria. Therapy is supportive but is not by itself evidence of pedagogy. No official annual or impact report was found.",
+            [
+                {"label": "Official about page", "url": "https://vijethas.com/about-us"},
+            ],
+        ),
+        _row(
+            "The reviewed official page does not document recurring arts, organised sport, competitions, public performances, educational visits, student leadership, external mentors, workplace exposure or child-led projects. Yoga is listed among therapeutic and educational services but no wider sport pathway is demonstrated. Residential care, therapy, healthcare and hostel provision are not counted as Development Environment evidence. Organisational awards are not child opportunities. No official annual or substantive impact report was located.",
+            [
+                {"label": "Official about page", "url": "https://vijethas.com/about-us"},
+            ],
+        ),
+    ),
+
+    "vikas_disabled_charitable_trust": _pack(
+        [
+            "vikas disabled charitable trust", "vikas disabled trust", "vdct",
+            "vikas trust for disabled", "vikas disabled charitable trust vdct",
+        ],
+        _row(
+            "The official Braille-education page states that some visually challenged students trained in computer use and voice software have worked part-time or full-time as Braille transcribers. This is a relevant livelihood signal, but no names, number trained, number employed, employer, duration or placement rate is published. The Trust also supports college fees and recognises high-scoring SSLC students, but no completion, college-entry or alumni destination data is provided. The official pages appear largely undated and no annual or substantive impact-report PDF was located.",
+            [
+                {"label": "Official Braille education page", "url": "https://www.vdct.in/education.php"},
+                {"label": "Official work summary", "url": "https://www.vdct.in/our-works.php"},
+            ],
+        ),
+        _row(
+            "VDCT documents Braille education, voice-software and computer training, English support, volunteer teaching, career guidance and recurring discussions, tasks and debates. These elements suggest an applied accessibility and skill-building model for visually impaired learners. Public pages do not state learner numbers by programme, timetable, curriculum sequence, trainer qualifications, assessment, attendance, completion or progression from hostel and training into work. Generic counselling and job-opportunity statements are not treated as achieved outcomes. No official annual or impact report was found.",
+            [
+                {"label": "Official Braille education page", "url": "https://www.vdct.in/education.php"},
+                {"label": "Official training page", "url": "https://www.vdct.in/training.php"},
+                {"label": "Official work summary", "url": "https://www.vdct.in/our-works.php"},
+            ],
+        ),
+        _row(
+            "Official pages list inspirational music programmes, Kannada Rajyotsava music, public Sugama Sangeetha shows, Braille-script and state-level drawing competitions, sports and cultural activity, and prizes for high-performing SSLC students. These indicate varied arts, public performance, competition and recognition opportunities. The pages are mostly undated, do not quantify child participation or frequency and may include adults with disabilities, so the opportunity range cannot be assumed for every hostel resident. Free hostel, food, medical support and counselling are not counted by themselves. No official annual or substantive impact report was located.",
+            [
+                {"label": "Official work summary", "url": "https://www.vdct.in/our-works.php"},
+                {"label": "Official Braille education page", "url": "https://www.vdct.in/education.php"},
+                {"label": "Official training page", "url": "https://www.vdct.in/training.php"},
+            ],
+        ),
+    ),
+
+    "vivekananda_vidyavardhaka_sangha_puttur": _pack(
+        [
+            "vivekananda vidyavardhaka sangha puttur", "vivekananda vidyavardhaka sangha",
+            "vivekananda vidyavardhaka sangha puttur dk", "vvs puttur",
+            "vivekananda education society puttur", "vivekanandaedu puttur",
+        ],
+        _row(
+            "The central Sangha site reports a network of more than 85 institutions across 28 campuses serving over 21,000 students. Individual institution pages claim strong examination performance, JEE or NEET admissions and sport or cultural achievements, but no consolidated results, names, denominators or disadvantaged-student destinations are published. Evidence from one PU college cannot be generalised to the full network. No consolidated official annual or substantive impact-report PDF was located; available recent documents include financial or regulatory records rather than programme outcomes. The public material also does not establish how many students receive free or subsidised education.",
+            [
+                {"label": "Official Sangha website", "url": "https://vivekanandaedu.org/"},
+                {"label": "Official about page", "url": "https://vivekanandaedu.org/about-us/"},
+                {"label": "Official Indraprastha PU College profile", "url": "https://vivekanandaedu.org/institution/indraprastha-pre-university-college-uppinangady/"},
+            ],
+        ),
+        _row(
+            "The Sangha operates a broad conventional education network spanning Kannada- and English-medium schools, PU colleges, degree and professional institutions, hostels and technical education. Some unit pages describe workshops, mentoring, career guidance and competitive-exam preparation, but the public material does not establish a common level-based, remedial, experiential or transition model across institutions. Curriculum, assessment and student support must be evaluated at institution level. A regulatory approval identifies at least one technical unit as private self-financing, so the network's rural mission should not be treated as proof of free access. No consolidated annual impact report was found.",
+            [
+                {"label": "Official about page", "url": "https://vivekanandaedu.org/about-us/"},
+                {"label": "Official Sangha website", "url": "https://vivekanandaedu.org/"},
+                {"label": "Official AICTE approval for technical unit", "url": "https://vpt.vivekanandaedu.org/wp-content/uploads/2026/03/EOA-Report-2024-25.pdf"},
+            ],
+        ),
+        _row(
+            "Individual institution pages mention organised sport, cultural activity, competitions and public events, and one PU college claims state- or national-level achievement. These are plausible opportunities at particular units, but the evidence does not show a consistent Development Environment across more than 85 institutions or specifically for economically disadvantaged students. No participation rates, recurring leadership system, educational visits, professional exposure or child-led civic projects are reported centrally. Ordinary campus infrastructure and hostel provision are not counted. No consolidated official annual or substantive impact report was located.",
+            [
+                {"label": "Official Indraprastha PU College profile", "url": "https://vivekanandaedu.org/institution/indraprastha-pre-university-college-uppinangady/"},
+                {"label": "Official Sangha website", "url": "https://vivekanandaedu.org/"},
+                {"label": "Official about page", "url": "https://vivekanandaedu.org/about-us/"},
+            ],
+        ),
+    ),
+
+
+    "greater_hope_charitable_trust": _pack(
+        [
+            "greater hope charitable trust", "greater hope trust",
+            "greater hope children orphanage", "greater hope children's orphanage",
+            "greater hope charity bengaluru",
+        ],
+        _row(
+            "The official website states that Greater Hope offers free education, literacy, skill training, scholarships and mentoring, but it provides no beneficiary count, age group, location-level cohort, duration, school continuation, examination, college, employment or named former-participant outcome. Donor and volunteer testimonials are promotional statements and are not treated as verified child progression. An official annual or substantive impact-report PDF was actively searched for but not located; the evidence pack therefore remains limited to the organisation's current website claims.",
+            [
+                {"label": "Official Greater Hope website", "url": "https://greaterhopecharitabletrust.org/"},
+                {"label": "Official about page", "url": "https://greaterhopecharitabletrust.org/about-us/"},
+            ],
+        ),
+        _row(
+            "The website refers to free literacy programmes, skill training, scholarships and mentorship for underprivileged people, women and children. It does not identify a named child programme, school or learning centre, curriculum, session schedule, teachers, assessment, attendance, age segmentation or progression pathway, and it does not separate child education from adult skill training. This is insufficient to establish a structured learning model. No official annual or substantive impact report was found.",
+            [
+                {"label": "Official Greater Hope website", "url": "https://greaterhopecharitabletrust.org/"},
+                {"label": "Official about page", "url": "https://greaterhopecharitabletrust.org/about-us/"},
+            ],
+        ),
+        _row(
+            "No demonstrated recurring child opportunities were found involving organised arts or sport, competitions, public performance, educational visits, professional exposure, leadership, creative projects or child-led civic participation. Generic mentorship and empowerment language is not sufficient without programme detail or evidence of delivery. Food distribution, shelter, healthcare and emotional support are baseline welfare activities and are not counted as Development Environment evidence. No official annual or substantive impact report was located.",
+            [
+                {"label": "Official Greater Hope website", "url": "https://greaterhopecharitabletrust.org/"},
+                {"label": "Official about page", "url": "https://greaterhopecharitabletrust.org/about-us/"},
+                {"label": "Official donation page", "url": "https://greaterhopecharitabletrust.org/product/donate-to-provide-essential-needs/"},
             ],
         ),
     ),
