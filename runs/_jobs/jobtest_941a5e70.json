@@ -1,0 +1,13 @@
+{
+  "run_id": "jobtest_941a5e70",
+  "job_type": "unit_test",
+  "status": "interrupted",
+  "stage": "interrupted_restart",
+  "run_dir": "/mnt/data/dfp2_inspect/backend/backend/runs/jobtest_941a5e70",
+  "owner_pid": 3167,
+  "cancel_requested": false,
+  "created_at": "2026-07-19T08:59:12Z",
+  "updated_at": "2026-07-19T08:59:12Z",
+  "interrupted_at": "2026-07-19T08:59:12Z",
+  "live_state": "not_running"
+}
