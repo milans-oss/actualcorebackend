@@ -8027,6 +8027,99 @@ def workstream_admin_transfer_tasks(payload: dict):
     return _json(True, data=data, transferred=len(indices), responses_moved=moved_response_count, from_pm=from_pm, to_pm=to_pm, moved=moved)
 
 
+@app.post("/workstream/admin/delete-tasks")
+def workstream_admin_delete_tasks(payload: dict):
+    """Permanently remove one PM shortlist assignment or a 1-based range.
+
+    Saved responses for removed assignments are deleted with the tasks, and all
+    remaining response indices are compacted so the PM workspace stays aligned.
+    """
+    try:
+        _workstream_check_admin(payload)
+    except HTTPException as e:
+        return _json(False, status_code=e.status_code, error=str(e.detail))
+
+    payload = payload or {}
+    pm_name = str(payload.get("pm") or payload.get("from_pm") or "").strip()
+    if not pm_name:
+        return _json(False, status_code=400, error="pm is required")
+
+    paths = [WORKSTREAM_DATA_FILE]
+    undo_before = _undo_snapshot_before(paths)
+    data = _read_workstream_payload()
+    pms = data.get("pms") if isinstance(data.get("pms"), dict) else {}
+    if pm_name not in pms:
+        return _json(False, status_code=400, error=f"Unknown PM: {pm_name}")
+    pm = pms[pm_name]
+    if str(pm.get("task_type") or "shortlisting") == "ngo_details":
+        return _json(False, status_code=400, error="This operation is only for PM shortlist assignments")
+
+    tasks = pm.get("tasks") if isinstance(pm.get("tasks"), list) else []
+    task_count = len(tasks)
+    zero_based = bool(payload.get("zero_based"))
+    raw_indices = payload.get("task_indices")
+    indices: list[int] = []
+    if isinstance(raw_indices, list) and raw_indices:
+        for value in raw_indices:
+            try:
+                parsed = int(value)
+                indices.append(parsed if zero_based else parsed - 1)
+            except Exception:
+                continue
+    else:
+        try:
+            start_index = int(payload.get("start_index") or payload.get("start") or payload.get("task_index"))
+        except Exception:
+            return _json(False, status_code=400, error="Provide task_index or start_index/end_index")
+        try:
+            end_index = int(payload.get("end_index") or payload.get("end") or start_index)
+        except Exception:
+            end_index = start_index
+        if not zero_based:
+            start_index -= 1
+            end_index -= 1
+        lo, hi = sorted([start_index, end_index])
+        indices = list(range(lo, hi + 1))
+
+    indices = sorted(set(indices))
+    bad = [index for index in indices if index < 0 or index >= task_count]
+    if not indices or bad:
+        return _json(
+            False,
+            status_code=400,
+            error="Delete range is outside the PM shortlist",
+            task_count=task_count,
+            bad_indices=[index + 1 for index in bad],
+        )
+
+    removed = []
+    responses = pm.get("responses") if isinstance(pm.get("responses"), dict) else {}
+    for index in indices:
+        task = tasks[index] if isinstance(tasks[index], dict) else {}
+        removed.append({
+            "task_index": index + 1,
+            "ngo_name": task.get("ngo_name") or task.get("name") or "",
+            "had_saved_response": bool(responses.get(str(index))),
+        })
+
+    remove_set = set(indices)
+    pm["tasks"] = [task for index, task in enumerate(tasks) if index not in remove_set]
+    pm["responses"] = _workstream_reindex_responses_after_task_removal(responses, remove_set)
+    _workstream_recount_pm(pm)
+
+    now_s = time.strftime("%Y-%m-%d %H:%M:%S")
+    summary = f"Deleted {len(indices)} shortlist item(s) from {pm_name}."
+    data.setdefault("global_log", []).insert(0, {
+        "summary": summary,
+        "at": now_s,
+        "delete": {"pm": pm_name, "count": len(indices), "items": removed[:100]},
+    })
+    data["global_log"] = data["global_log"][:200]
+    data = _write_workstream_payload(data)
+    _undo_snapshot_after("workstream_delete_tasks", summary, "", paths, undo_before)
+    return _json(True, data=data, deleted=len(indices), pm=pm_name, removed=removed)
+
+
 @app.post("/workstream/admin/lock-edits")
 def workstream_admin_lock_edits(payload: dict):
     """Backward-compatible no-op.
@@ -9386,6 +9479,52 @@ def _workstream_review_candidates(data: dict) -> list[dict]:
     return rows
 
 
+def _workstream_metric_review_candidates(data: dict) -> list[dict]:
+    """Return only completed three-metric PM shortlist assessments.
+
+    Legacy overall rankings remain available to the final-ranking workflow, but
+    Combined Shortlisting is intentionally based only on the new metric model.
+    """
+    rows: list[dict] = []
+    for pm_name, pm in (data.get("pms") or {}).items():
+        if str(pm.get("task_type") or "shortlisting") == "ngo_details":
+            continue
+        tasks = pm.get("tasks") if isinstance(pm.get("tasks"), list) else []
+        responses = pm.get("responses") if isinstance(pm.get("responses"), dict) else {}
+        for idx, task in enumerate(tasks):
+            response = responses.get(str(idx)) or {}
+            if not _workstream_metric_complete(response):
+                continue
+            scores = _clean_workstream_metric_scores(response.get("metric_scores"))
+            child = int((scores.get("child_progression") or {}).get("rank") or 0)
+            learning = int((scores.get("learning_model") or {}).get("rank") or 0)
+            ecosystem = int((scores.get("development_ecosystem") or {}).get("rank") or 0)
+            combined_points = child + learning + ecosystem
+            row = {
+                "pm": pm_name,
+                "reviewer": pm_name,
+                "task_index": idx,
+                "ngo_name": task.get("ngo_name") or task.get("name") or "",
+                "website": task.get("website") or "",
+                "background": task.get("background") or "",
+                "one_line_understanding": task.get("one_line_understanding") or _first_sentence(task.get("background") or ""),
+                "lead_id": task.get("lead_id") or "",
+                "source_mix": task.get("source_mix") or task.get("source") or "",
+                "child_progression": child,
+                "learning_model": learning,
+                "development_ecosystem": ecosystem,
+                "combined_points": combined_points,
+                "combined_score": round(combined_points / 15, 4),
+                "combined_percent": round((combined_points / 15) * 100, 2),
+                "metric_scores": scores,
+                "exception_override": _clean_workstream_exception_override(response.get("exception_override")),
+                "submitted_at": response.get("metric_submitted_at") or response.get("submitted_at") or "",
+            }
+            row["ngo_ref"] = _ranking_ngo_ref(row)
+            rows.append(row)
+    return rows
+
+
 def _build_final_board_rows(region: str = "Karnataka") -> list[dict]:
     data = _read_workstream_payload()
     review_rows = [row for row in _workstream_review_candidates(data) if row.get("submitted") and int(row.get("rating") or 0) > 0]
@@ -9487,45 +9626,76 @@ def _build_final_board_rows(region: str = "Karnataka") -> list[dict]:
 @app.get("/ranking/compiled-review")
 def ranking_compiled_review(region: str = "Karnataka"):
     data = _read_workstream_payload()
-    final_state = _read_final_ranking_state(region)
-    selections = final_state.get("selections") or {}
-    grouped = {str(i): [] for i in [5,4,3,2,1]}
-    grouped["pending"] = []
-    pm_counts: dict[str, dict] = {}
-    for row in _workstream_review_candidates(data):
-        pm_name = str(row.get("reviewer") or row.get("pm") or "")
-        pm_counts.setdefault(pm_name, {"5":0,"4":0,"3":0,"2":0,"1":0,"total":0})
-        base_row = {
-            "ngo_ref": row.get("ngo_ref"),
-            "lead_id": row.get("lead_id") or "",
-            "ngo_name": row.get("ngo_name") or "",
-            "reviewer": pm_name,
-            "website": row.get("website") or "",
-            "one_line_understanding": row.get("one_line_understanding") or "",
-            "background": row.get("background") or "",
-            "source": row.get("source_mix") or "",
-            "task_index": row.get("task_index"),
-            "selected_for_final": bool(selections.get(str(row.get("ngo_ref") or ""))),
-            "final_bucket": (selections.get(str(row.get("ngo_ref") or "")) or {}).get("final_bucket") or "",
-        }
-        if row.get("submitted"):
-            rating = int(row.get("rating") or 0)
-            base_row.update({"rating": rating, "comment": row.get("comment") or "", "submitted_at": row.get("submitted_at") or ""})
-            if str(rating) in grouped:
-                grouped[str(rating)].append(base_row)
-                pm_counts[pm_name][str(rating)] += 1
-                pm_counts[pm_name]["total"] += 1
-        else:
-            grouped["pending"].append(base_row)
+    metric_rows = _workstream_metric_review_candidates(data)
+
+    grouped: dict[str, list[dict]] = {}
+    for row in metric_rows:
+        grouped.setdefault(str(row.get("ngo_ref") or _ranking_ngo_ref(row)), []).append(row)
+
+    combined_rows: list[dict] = []
+    for ngo_ref, reviews in grouped.items():
+        reviews = sorted(reviews, key=lambda row: str(row.get("submitted_at") or ""), reverse=True)
+        latest = reviews[0]
+        review_count = len(reviews)
+        child = round(sum(float(row.get("child_progression") or 0) for row in reviews) / review_count, 2)
+        learning = round(sum(float(row.get("learning_model") or 0) for row in reviews) / review_count, 2)
+        ecosystem = round(sum(float(row.get("development_ecosystem") or 0) for row in reviews) / review_count, 2)
+        combined_points = round(child + learning + ecosystem, 2)
+        reviewers = []
+        for row in reviews:
+            reviewer = str(row.get("reviewer") or row.get("pm") or "").strip()
+            if reviewer and reviewer not in reviewers:
+                reviewers.append(reviewer)
+        combined_rows.append({
+            "ngo_ref": ngo_ref,
+            "lead_id": latest.get("lead_id") or "",
+            "ngo_name": latest.get("ngo_name") or "",
+            "website": latest.get("website") or "",
+            "background": latest.get("background") or "",
+            "one_line_understanding": latest.get("one_line_understanding") or "",
+            "source": latest.get("source_mix") or "",
+            "reviewers": reviewers,
+            "reviewer_count": len(reviewers),
+            "assessment_count": review_count,
+            "child_progression": child,
+            "learning_model": learning,
+            "development_ecosystem": ecosystem,
+            "combined_points": combined_points,
+            "combined_score": round(combined_points / 15, 4),
+            "combined_percent": round((combined_points / 15) * 100, 2),
+            "latest_submitted_at": latest.get("submitted_at") or "",
+        })
+
+    combined_rows.sort(key=lambda row: (
+        -float(row.get("combined_score") or 0),
+        -float(row.get("child_progression") or 0),
+        -float(row.get("learning_model") or 0),
+        -float(row.get("development_ecosystem") or 0),
+        str(row.get("ngo_name") or "").lower(),
+    ))
+    for index, row in enumerate(combined_rows, start=1):
+        row["combined_rank"] = index
+
+    shortlisting_pms = [
+        pm for pm in (data.get("pms") or {}).values()
+        if str(pm.get("task_type") or "shortlisting") != "ngo_details"
+    ]
+    total_to_be_done = sum(len(pm.get("tasks") or []) for pm in shortlisting_pms)
+    completed_assessments = len(metric_rows)
+    average_combined_score = round(
+        sum(float(row.get("combined_score") or 0) for row in combined_rows) / len(combined_rows), 4
+    ) if combined_rows else 0
+
     return _json(
         True,
         region=region,
-        grouped_by_rating=grouped,
-        pm_counts=pm_counts,
-        pending_count=len(grouped["pending"]),
-        total_rated=sum(v["total"] for v in pm_counts.values()),
-        total_assigned=sum(len((pm.get("tasks") or [])) for pm in (data.get("pms") or {}).values()),
-        final_selection_count=len(selections),
+        rows=combined_rows,
+        total_shortlisted=len(combined_rows),
+        completed_assessments=completed_assessments,
+        total_to_be_done=total_to_be_done,
+        left_to_assess=max(0, total_to_be_done - completed_assessments),
+        average_combined_score=average_combined_score,
+        scoring_formula="(Child Progression + Learning Model + Development Ecosystem) / 15",
     )
 
 
