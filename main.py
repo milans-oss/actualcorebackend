@@ -7120,7 +7120,7 @@ def story_state_start(state: str, categories: str = "", budget: int = STORY_STAT
 # Workstream tracker storage + lightweight AI review
 # -----------------------------------------------------------------------------
 WORKSTREAM_DATA_FILE = RUNS_DIR / "workstream_data.json"
-WORKSTREAM_PM_NAMES = ["Milan", "Rachit", "Ipshita", "Avika", "Kamran", "Piyush", "Tanishq"]
+WORKSTREAM_PM_NAMES = ["Milan", "Rachit", "Ipshita", "Avika", "Kamran", "Piyush", "Tanishq", "Guest"]
 WORKSTREAM_METRIC_KEYS = ["child_progression", "learning_model", "development_ecosystem"]
 DEFAULT_WORKSTREAM_RULES = """Review only expression quality. Do not critique the NGO, the rank, the pathway, the cohort, the source, or whether the PM is right. Do not mention specific NGO facts. Check whether the PM expressed their own judgement clearly enough for consolidation: is there enough length, is the thought process understandable, and does it capture what went through their head? Hinglish, fragments, rough English, spelling mistakes, missing punctuation, and stream-of-consciousness notes are all acceptable. More depth is encouraged. Rank explanations should capture what went through the reviewer’s head, but the review should only ask for more expression, not judge content."""
 DEFAULT_WORKSTREAM_TASKS = [
@@ -7128,11 +7128,8 @@ DEFAULT_WORKSTREAM_TASKS = [
     {"ngo_name": "Cerebloom Academy", "website": "https://cerebloom.org/", "background": "Rural science education and mentorship program for underserved students. Review regularity and depth."},
     {"ngo_name": "Don Bosco Child Labour Mission", "website": "dbclm.org", "background": "Child labour rehabilitation, bridge schooling, open shelter and prevention work. Verify current scale and pathway depth."},
 ]
-DEFAULT_TANISHQ_TASKS = [
-    {"ngo_name": "Referral NGO 1", "website": "", "background": "Capture NGO details, POC contact number, and referral source."},
-    {"ngo_name": "Referral NGO 2", "website": "", "background": "Capture NGO details, POC contact number, and referral source."},
-    {"ngo_name": "Referral NGO 3", "website": "", "background": "Capture NGO details, POC contact number, and referral source."},
-]
+LEGACY_TANISHQ_PLACEHOLDER_NAMES = {"referral ngo 1", "referral ngo 2", "referral ngo 3"}
+WORKSTREAM_GUEST_TANISHQ_MIGRATION = "v82_guest_and_tanishq_shortlisting"
 
 _BACKEND_MODULE_DIR = str(Path(__file__).resolve().parent)
 if _BACKEND_MODULE_DIR not in sys.path:
@@ -7320,17 +7317,19 @@ def _default_workstream_payload():
     now = int(time.time())
     pms = {}
     for i, name in enumerate(WORKSTREAM_PM_NAMES):
-        is_details = name == "Tanishq"
+        is_guest = name == "Guest"
+        starts_empty = name in {"Tanishq", "Guest"}
         pms[name] = {
             "name": name,
             "deadline": time.strftime("%Y-%m-%dT%H:%M", time.localtime(now + (18 + i) * 3600)),
-            "responsibility": ("Complete NGO descriptions and referral / POC details cleanly." if is_details else "Review assigned NGOs and capture your judgement clearly. Stream of consciousness is fine; useful reasoning matters more than polished sentences."),
-            "task_type": "ngo_details" if is_details else "shortlisting",
-            "tasks": DEFAULT_TANISHQ_TASKS if is_details else DEFAULT_WORKSTREAM_TASKS,
+            "responsibility": "" if is_guest else "Review assigned NGOs and capture your judgement clearly. Stream of consciousness is fine; useful reasoning matters more than polished sentences.",
+            "task_type": "shortlisting",
+            "tasks": [] if starts_empty else DEFAULT_WORKSTREAM_TASKS,
             "responses": {},
             "first_five_reviewed": False,
             "global_saved_at": "",
             "global_saved_count": 0,
+            "guest_mode": is_guest,
             "deadline_note": "Once everyone submits, we compare rankings, identify strong cohorts, resolve overlaps, and move to human lead follow-ups. This needs to close by Wednesday so the lead list can be wrapped by the end of the week.",
         }
     return {
@@ -7342,6 +7341,169 @@ def _default_workstream_payload():
         "updated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
     }
 
+
+
+def _workstream_guest_reference_from_response(pm_name: str, response: dict | None) -> dict:
+    """Create the hidden PM benchmark revealed only after a Guest submits."""
+    if not isinstance(response, dict):
+        return {}
+    out = {
+        "reviewer": str(pm_name or "Program Manager"),
+        "submitted_at": str(response.get("metric_submitted_at") or response.get("submitted_at") or ""),
+    }
+    if _workstream_metric_complete(response):
+        out["metric_scores"] = _clean_workstream_metric_scores(response.get("metric_scores"))
+        out["exception_override"] = _clean_workstream_exception_override(response.get("exception_override"))
+    legacy_rank = response.get("rank") or response.get("decision")
+    try:
+        parsed_rank = int(float(str(legacy_rank)))
+    except Exception:
+        parsed_rank = 0
+    if 1 <= parsed_rank <= 5:
+        out["rank"] = parsed_rank
+        out["decision"] = parsed_rank
+        out["rank_label"] = str(response.get("rank_label") or "")[:160]
+        out["reason"] = str(response.get("reason") or "")[:6000]
+    if "metric_scores" not in out and "rank" not in out:
+        return {}
+    return out
+
+
+def _workstream_guest_reference_for_task(data: dict, task: dict | None) -> dict:
+    """Resolve the source PM assessment for a Guest task without exposing it early."""
+    if not isinstance(task, dict):
+        return {}
+    stored = task.get("guest_reference_review")
+    if isinstance(stored, dict) and stored:
+        return stored
+    source_pm_name = str(task.get("guest_reference_source_pm") or task.get("transferred_from") or "").strip()
+    if not source_pm_name or source_pm_name == "Guest":
+        return {}
+    source_pm = ((data.get("pms") or {}).get(source_pm_name) or {})
+    source_tasks = source_pm.get("tasks") if isinstance(source_pm.get("tasks"), list) else []
+    source_responses = source_pm.get("responses") if isinstance(source_pm.get("responses"), dict) else {}
+
+    candidate_indices = []
+    try:
+        candidate_indices.append(int(task.get("guest_reference_source_task_index")))
+    except Exception:
+        pass
+
+    guest_name = str(task.get("ngo_name") or task.get("name") or "").strip().lower()
+    guest_website = str(task.get("website") or "").strip().lower().rstrip("/")
+    for idx, source_task in enumerate(source_tasks):
+        if idx in candidate_indices or not isinstance(source_task, dict):
+            continue
+        source_name = str(source_task.get("ngo_name") or source_task.get("name") or "").strip().lower()
+        source_website = str(source_task.get("website") or "").strip().lower().rstrip("/")
+        if guest_name and source_name == guest_name and (not guest_website or not source_website or source_website == guest_website):
+            candidate_indices.append(idx)
+
+    for idx in candidate_indices:
+        response = source_responses.get(str(idx))
+        reference = _workstream_guest_reference_from_response(source_pm_name, response)
+        if reference:
+            return reference
+    return {}
+
+
+def _migrate_workstream_guest_and_tanishq(data: dict) -> bool:
+    """Move Tanishq off the legacy referral-details desk and add Guest safely."""
+    changed = False
+    pms = data.setdefault("pms", {})
+    defaults = _default_workstream_payload()["pms"]
+
+    guest = pms.setdefault("Guest", dict(defaults["Guest"]))
+    for key, value in defaults["Guest"].items():
+        guest.setdefault(key, value)
+    if guest.get("task_type") != "shortlisting":
+        guest["task_type"] = "shortlisting"
+        changed = True
+    if guest.get("responsibility"):
+        guest["responsibility"] = ""
+        changed = True
+    if guest.get("guest_mode") is not True:
+        guest["guest_mode"] = True
+        changed = True
+    if not isinstance(guest.get("tasks"), list):
+        guest["tasks"] = []
+        changed = True
+    if not isinstance(guest.get("responses"), dict):
+        guest["responses"] = {}
+        changed = True
+
+    tanishq = pms.setdefault("Tanishq", dict(defaults["Tanishq"]))
+    for key, value in defaults["Tanishq"].items():
+        tanishq.setdefault(key, value)
+    tanishq["guest_mode"] = False
+    if str(tanishq.get("task_type") or "shortlisting") == "ngo_details":
+        old_tasks = tanishq.get("tasks") if isinstance(tanishq.get("tasks"), list) else []
+        old_responses = tanishq.get("responses") if isinstance(tanishq.get("responses"), dict) else {}
+        migrated_tasks = []
+        archived = []
+        for idx, raw_task in enumerate(old_tasks):
+            task = dict(raw_task or {})
+            response = old_responses.get(str(idx)) if isinstance(old_responses.get(str(idx)), dict) else {}
+            name = str(task.get("ngo_name") or task.get("name") or "").strip()
+            description = str(response.get("ngo_description") or "").strip()
+            contact = str(response.get("contact_number") or response.get("referral_poc") or "").strip()
+            referral = str(response.get("referral_source") or "").strip()
+            website = str(task.get("website") or "").strip()
+            placeholder = name.lower() in LEGACY_TANISHQ_PLACEHOLDER_NAMES
+            if placeholder and not description and not contact and not referral and not website:
+                continue
+            existing_background = str(task.get("background") or "").strip()
+            if placeholder and existing_background.lower().startswith("capture ngo details"):
+                existing_background = ""
+            additions = []
+            if description:
+                additions.append(f"NGO details: {description}")
+            if contact:
+                additions.append(f"POC: {contact}")
+            if referral:
+                additions.append(f"Referral source: {referral}")
+            task["background"] = " | ".join(x for x in [existing_background, *additions] if x)[:8000]
+            task["migrated_from_ngo_details"] = True
+            migrated_tasks.append(task)
+            if response:
+                archived.append({"task_index": idx, "ngo_name": name, "response": response})
+        tanishq["tasks"] = migrated_tasks
+        tanishq["legacy_details_archive"] = archived[:500]
+        tanishq["responses"] = {}
+        tanishq["task_type"] = "shortlisting"
+        tanishq["responsibility"] = defaults["Tanishq"]["responsibility"]
+        _workstream_recount_pm(tanishq)
+        changed = True
+    elif tanishq.get("task_type") != "shortlisting":
+        tanishq["task_type"] = "shortlisting"
+        changed = True
+
+    migrations = data.setdefault("data_migrations", {})
+    if WORKSTREAM_GUEST_TANISHQ_MIGRATION not in migrations:
+        migrations[WORKSTREAM_GUEST_TANISHQ_MIGRATION] = {
+            "applied_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+            "tanishq_tasks": len(tanishq.get("tasks") or []),
+            "guest_tasks": len(guest.get("tasks") or []),
+        }
+        changed = True
+    return changed
+
+
+def _workstream_public_payload(data: dict) -> dict:
+    """Hide the Guest benchmark until that Guest assessment has been submitted."""
+    public = json.loads(json.dumps(data, ensure_ascii=False))
+    guest = ((public.get("pms") or {}).get("Guest") or {})
+    tasks = guest.get("tasks") if isinstance(guest.get("tasks"), list) else []
+    responses = guest.get("responses") if isinstance(guest.get("responses"), dict) else {}
+    for idx, task in enumerate(tasks):
+        response = responses.get(str(idx)) if isinstance(responses.get(str(idx)), dict) else {}
+        if not _workstream_metric_complete(response) and isinstance(task, dict):
+            task.pop("guest_reference_review", None)
+    # The old referral-detail archive is retained on disk but never sent to the UI.
+    tanishq = ((public.get("pms") or {}).get("Tanishq") or {})
+    if isinstance(tanishq, dict):
+        tanishq.pop("legacy_details_archive", None)
+    return public
 
 def _read_workstream_payload():
     if not WORKSTREAM_DATA_FILE.exists():
@@ -7369,8 +7531,9 @@ def _read_workstream_payload():
             cur["tasks"] = default_pm["tasks"]
         if not isinstance(cur.get("responses"), dict):
             cur["responses"] = {}
+    structure_changed = _migrate_workstream_guest_and_tanishq(data)
     evidence_changed, _ = _apply_workstream_evidence_presets(data)
-    if evidence_changed:
+    if structure_changed or evidence_changed:
         _atomic_write_text(WORKSTREAM_DATA_FILE, json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
     return data
 
@@ -7850,7 +8013,7 @@ Submitted rows:
 
 @app.get("/workstream")
 def workstream_get():
-    return _json(True, data=_read_workstream_payload())
+    return _json(True, data=_workstream_public_payload(_read_workstream_payload()))
 
 
 @app.get("/workstream/storage-info")
@@ -7921,7 +8084,7 @@ def workstream_admin_update(payload: dict):
             tasks_now[evidence_idx]["metric_evidence"] = _clean_workstream_metric_evidence((payload or {}).get("metric_evidence"))
     _write_workstream_payload(data)
     _undo_snapshot_after("workstream_admin_update", "PM view settings/tasks updated", "", paths, undo_before)
-    return _json(True, data=data)
+    return _json(True, data=_workstream_public_payload(data))
 
 
 @app.post("/workstream/admin/transfer-tasks")
@@ -7998,14 +8161,25 @@ def workstream_admin_transfer_tasks(payload: dict):
     moved = []
     for old_idx in indices:
         task = dict(source_tasks[old_idx] or {})
+        resp = source_responses.get(str(old_idx))
         task["transferred_from"] = from_pm
         task["transferred_to"] = to_pm
         task["transferred_at"] = now_s
         task["original_task_index"] = old_idx + 1
+        if to_pm == "Guest":
+            reference = _workstream_guest_reference_from_response(from_pm, resp)
+            if reference:
+                task["guest_reference_review"] = reference
+            task["guest_reference_source_pm"] = from_pm
+            task["guest_reference_source_task_index"] = old_idx
+        else:
+            task.pop("guest_reference_review", None)
+            task.pop("guest_reference_source_pm", None)
         new_idx = len(target_tasks)
         target_tasks.append(task)
-        resp = source_responses.get(str(old_idx))
-        if move_responses and isinstance(resp, dict) and resp.get("submitted"):
+        # Guest always starts with a blank assessment. The source PM benchmark is
+        # stored on the task and revealed only after Guest submits.
+        if to_pm != "Guest" and from_pm != "Guest" and move_responses and isinstance(resp, dict) and _workstream_response_complete(source, resp):
             copied = dict(resp)
             copied["transferred_from"] = from_pm
             copied["transferred_at"] = now_s
@@ -8013,18 +8187,24 @@ def workstream_admin_transfer_tasks(payload: dict):
             moved_response_count += 1
         moved.append({"ngo_name": task.get("ngo_name") or task.get("name") or "", "from_index": old_idx + 1, "to_index": new_idx + 1})
 
-    remove_set = set(indices)
-    source["tasks"] = [task for idx, task in enumerate(source_tasks) if idx not in remove_set]
-    source["responses"] = _workstream_reindex_responses_after_task_removal(source_responses, remove_set)
+    # Guest is a blind second-review lane. Copy assignments into Guest so the
+    # source PM task, progress and official score remain untouched. All other
+    # PM-to-PM transfers retain the existing move semantics.
+    copied_to_guest = to_pm == "Guest"
+    if not copied_to_guest:
+        remove_set = set(indices)
+        source["tasks"] = [task for idx, task in enumerate(source_tasks) if idx not in remove_set]
+        source["responses"] = _workstream_reindex_responses_after_task_removal(source_responses, remove_set)
     _workstream_recount_pm(source)
     _workstream_recount_pm(target)
 
-    summary = f"Transferred {len(indices)} shortlist item(s) from {from_pm} to {to_pm}."
+    action_word = "Copied" if copied_to_guest else "Transferred"
+    summary = f"{action_word} {len(indices)} shortlist item(s) from {from_pm} to {to_pm}."
     data.setdefault("global_log", []).insert(0, {"summary": summary, "at": now_s, "transfer": {"from_pm": from_pm, "to_pm": to_pm, "count": len(indices), "responses_moved": moved_response_count, "items": moved[:50]}})
     data["global_log"] = data["global_log"][:200]
     data = _write_workstream_payload(data)
     _undo_snapshot_after("workstream_transfer_tasks", summary, "", paths, undo_before)
-    return _json(True, data=data, transferred=len(indices), responses_moved=moved_response_count, from_pm=from_pm, to_pm=to_pm, moved=moved)
+    return _json(True, data=_workstream_public_payload(data), transferred=len(indices), copied=copied_to_guest, responses_moved=moved_response_count, from_pm=from_pm, to_pm=to_pm, moved=moved)
 
 
 @app.post("/workstream/admin/delete-tasks")
@@ -8117,7 +8297,7 @@ def workstream_admin_delete_tasks(payload: dict):
     data["global_log"] = data["global_log"][:200]
     data = _write_workstream_payload(data)
     _undo_snapshot_after("workstream_delete_tasks", summary, "", paths, undo_before)
-    return _json(True, data=data, deleted=len(indices), pm=pm_name, removed=removed)
+    return _json(True, data=_workstream_public_payload(data), deleted=len(indices), pm=pm_name, removed=removed)
 
 
 @app.post("/workstream/admin/lock-edits")
@@ -8134,7 +8314,7 @@ def workstream_admin_lock_edits(payload: dict):
     data = _read_workstream_payload()
     data.pop("edit_locks", None)
     data = _write_workstream_payload(data)
-    return _json(True, data=data, edit_locks={"all": False, "pms": {}}, locked=False, removed=True, message="PM edit locking has been removed; all PM workspaces are editable.")
+    return _json(True, data=_workstream_public_payload(data), edit_locks={"all": False, "pms": {}}, locked=False, removed=True, message="PM edit locking has been removed; all PM workspaces are editable.")
 
 
 @app.post("/workstream/submit-metrics")
@@ -8183,12 +8363,16 @@ def workstream_submit_metrics(payload: dict):
     response["metric_submitted_at"] = now_s
     response["metric_scoring_version"] = str((payload or {}).get("metric_scoring_version") or "v1.2")[:80]
     responses[str(idx)] = response
+    if pm_name == "Guest" and isinstance(task, dict):
+        reference = _workstream_guest_reference_for_task(data, task)
+        if reference:
+            task["guest_reference_review"] = reference
     pm["last_metric_submitted_task_index"] = idx
     pm["last_metric_submitted_at"] = now_s
     _workstream_recount_pm(pm)
     data = _write_workstream_payload(data)
     _undo_snapshot_after("workstream_submit_metrics", f"Three metric scores submitted: {pm_name}", "", paths, undo_before)
-    return _json(True, data=data, metric_submitted_count=pm.get("global_saved_count", 0))
+    return _json(True, data=_workstream_public_payload(data), metric_submitted_count=pm.get("global_saved_count", 0), guest_reference_review=(task.get("guest_reference_review") if pm_name == "Guest" and isinstance(task, dict) else None))
 
 
 @app.post("/workstream/submit")
@@ -8234,7 +8418,7 @@ def workstream_submit(payload: dict):
     pm["global_saved_at"] = response["global_saved_at"]
     data = _write_workstream_payload(data)
     _undo_snapshot_after("workstream_submit", f"PM response submitted: {pm_name}", "", paths, undo_before)
-    return _json(True, data=data, submitted_count=submitted_count, first_five_due=(submitted_count <= 5))
+    return _json(True, data=_workstream_public_payload(data), submitted_count=submitted_count, first_five_due=(submitted_count <= 5))
 
 
 @app.post("/workstream/delete-metrics")
@@ -8261,7 +8445,7 @@ def workstream_delete_metrics(payload: dict):
     _workstream_recount_pm(pm)
     data = _write_workstream_payload(data)
     _undo_snapshot_after("workstream_delete_metrics", f"Three metric scores cleared: {pm_name}", "", paths, undo_before)
-    return _json(True, data=data)
+    return _json(True, data=_workstream_public_payload(data))
 
 
 @app.post("/workstream/delete-response")
@@ -8282,7 +8466,7 @@ def workstream_delete_response(payload: dict):
     pm["global_saved_at"] = time.strftime("%Y-%m-%d %H:%M:%S")
     _write_workstream_payload(data)
     _undo_snapshot_after("workstream_delete_response", f"PM response deleted: {pm_name}", "", paths, undo_before)
-    return _json(True, data=data)
+    return _json(True, data=_workstream_public_payload(data))
 
 
 @app.post("/workstream/global-save")
@@ -8308,7 +8492,7 @@ def workstream_global_save(payload: dict):
     data["global_log"] = data["global_log"][:100]
     _write_workstream_payload(data)
     _undo_snapshot_after("workstream_global_save", f"PM responses saved globally: {pm_name}", "", paths, undo_before)
-    return _json(True, data=data, summary=summary)
+    return _json(True, data=_workstream_public_payload(data), summary=summary)
 
 
 @app.post("/workstream/ai/review")
@@ -9487,6 +9671,8 @@ def _workstream_metric_review_candidates(data: dict) -> list[dict]:
     """
     rows: list[dict] = []
     for pm_name, pm in (data.get("pms") or {}).items():
+        if pm_name == "Guest":
+            continue
         if str(pm.get("task_type") or "shortlisting") == "ngo_details":
             continue
         tasks = pm.get("tasks") if isinstance(pm.get("tasks"), list) else []
@@ -9677,8 +9863,8 @@ def ranking_compiled_review(region: str = "Karnataka"):
         row["combined_rank"] = index
 
     shortlisting_pms = [
-        pm for pm in (data.get("pms") or {}).values()
-        if str(pm.get("task_type") or "shortlisting") != "ngo_details"
+        pm for pm_name, pm in (data.get("pms") or {}).items()
+        if pm_name != "Guest" and str(pm.get("task_type") or "shortlisting") != "ngo_details"
     ]
     total_to_be_done = sum(len(pm.get("tasks") or []) for pm in shortlisting_pms)
     completed_assessments = len(metric_rows)
