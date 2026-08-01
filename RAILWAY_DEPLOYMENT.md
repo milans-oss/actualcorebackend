@@ -1,12 +1,20 @@
-# Core Backend v85 — Railway deployment
+# Core Backend v88 — Railway deployment
 
-1. Upload this ZIP to the Git repository connected to the existing **core backend** Railway service.
-2. Keep the current persistent volume and mount it at `/data`.
-3. Set `RUNS_DIR=/data/runs`.
-4. Keep the existing `ADMIN_PASSWORD`.
-5. Set `FRONTEND_ORIGIN` to the final frontend Railway domain.
-6. Deploy. Railway can use the root `railway.json`; no root-directory change is required. If the service already uses Root Directory `/backend`, the inner `backend/railway.json` also works.
-7. Confirm `GET /health` returns HTTP 200.
-8. Open the frontend and refresh the **DFP NGO ID Registry**. Startup backfill runs automatically. Enter `ADMIN_PASSWORD` and click **Backfill historical IDs** once if the inventory is incomplete, then export the registry.
+1. Extract this ZIP into the root of the Git repository connected to the existing core-backend service.
+2. Do not detach or replace the historical persistent volume. Mount it at `/data`.
+3. Set:
 
-Do not detach or replace the old core-backend volume during this deployment. Historical IDs can only be assigned to historical data that is still on that volume.
+```text
+RUNS_DIR=/data/runs
+ADMIN_PASSWORD=<your existing password>
+DFP2_PRODUCTION=true
+DFP2_SERVICE_ROLE=core
+FRONTEND_ORIGIN=https://<frontend>.up.railway.app
+```
+
+4. Delete `DFP2_ADMIN_TOKEN` and `DFP2_REQUIRE_MUTATION_AUTH` if they remain from an older release.
+5. Deploy and confirm `GET /health`.
+6. Confirm that `/karnataka-recovery/modes` returns a wrong-service 404 on core; that route belongs only to the search worker.
+7. Use the DFP NGO ID Registry card in the frontend to refresh status and run the idempotent historical backfill when required.
+
+Only `ADMIN_PASSWORD` is used for protected operations.

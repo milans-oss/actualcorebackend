@@ -178,3 +178,193 @@ def test_capacity_route_reports_effective_single_account_concurrency(monkeypatch
     assert payload['healthy_serper_accounts'] == 1
     assert payload['recommended_max_concurrency'] == 2
     assert payload['configuration_warning'].startswith('SERPER_API_KEYS is ignored')
+
+
+def metadata(title, site_name=None, footer=None):
+    return {
+        "page_title": title,
+        "og_site_name": site_name if site_name is not None else title,
+        "footer_text": footer if footer is not None else f"© {title}",
+        "meta_description": "",
+        "jsonld_org_names": [],
+    }
+
+
+@pytest.mark.parametrize("name,url", [
+    ("Guardians of Dreams", "https://milaap.org/fundraisers/godreamskochi1"),
+    ("Asha Kirana Seva Trust", "https://www.helpyourngo.com/ngo/1570/children/asha-kirana-seva-trust"),
+    ("Vimochana Development Society", "https://www.myngos.in/ngo-details/vimochana-development-society-in-karnataka"),
+    ("Shivashakthi Foundation", "https://www.tatanexarc.com/company/shree-shivashakthi-innovative-utn5150shr80xqx/"),
+    ("Reach Rural Development Society", "https://www.ixigo.com/buses/hyderabad-yadgir-sts"),
+    ("The Hope House", "https://pmc.ncbi.nlm.nih.gov/articles/PMC10615235/"),
+    ("Auxilium Navajeevana Society", "https://orellsoft.com/client"),
+    ("Deenabandhu", "https://rinatham.com/2018/03/13/deenabandhu-chamarajanagar-karnataka/"),
+    ("Gonikoppal Higher Primary School", "https://abhyudayakkss.org/school-kit-distribution-at-ghps-kajuru-aigur-village/"),
+])
+def test_known_third_party_patterns_are_never_owned_candidates(name, url):
+    row = base_row(name=name, referral_name=name)
+    assert kr.page_type_for_candidate(url, row=row) in {
+        "directory_or_registry", "article_or_profile", "third_party_mention_candidate",
+        "government_academic_or_document_reference", "wrong_entity",
+    }
+
+
+@pytest.mark.parametrize("row,url,brand,body", [
+    (
+        base_row(name="Shifting Orbits Foundation", referral_name="Shifting Orbits Foundation", registration_reference="", registered_address="", pincode=""),
+        "https://www.northsouth.org/", "NorthSouth",
+        "NorthSouth supported a changemaker working with Shifting Orbits Foundation.",
+    ),
+    (
+        base_row(name="DIVINE MERCY CHARITABLE TRUST", referral_name="Divine Mercy Charitable Trust", registration_reference="", registered_address="", pincode=""),
+        "https://www.divinemercydevotion.net/", "Divine Mercy Devotion",
+        "Divine Mercy prayers and novena. Divine Mercy Charitable Trust is mentioned in one story.",
+    ),
+    (
+        base_row(name="VISION INDIA FOUNDATION", referral_name="Vision India Trust", registration_reference="", registered_address="", pincode=""),
+        "https://www.giftofvision.org/25-years-of-sankara-eye-foundation-usa", "Sankara Eye Foundation",
+        "An anniversary article that mentions Vision India Foundation.",
+    ),
+])
+def test_exact_name_mention_without_ownership_is_rejected(row, url, brand, body):
+    result = kr.identity_verification(
+        row, url, body, "owned_site_candidate", fetch_metadata=metadata(brand)
+    )
+    assert result["status"] == "rejected_third_party_or_unowned"
+    assert result["verified"] is False
+    assert "no independent ownership proof" in result["conflicts"]
+
+
+def test_official_domain_with_structured_owner_verifies():
+    row = base_row(
+        name="PRAGATHI CHARITABLE TRUST", referral_name="Pragathi Charitable Trust",
+        registration_reference="", registered_address="", pincode="",
+    )
+    result = kr.identity_verification(
+        row, "https://pragathitrust.org/",
+        "PRAGATHI CHARITABLE TRUST is a registered charitable trust in Bengaluru Urban.",
+        "owned_site_candidate", fetch_metadata=metadata("Pragathi Charitable Trust"),
+    )
+    assert result["status"] == "verified_owned_site"
+    assert result["ownership"] == "owned_organisation_site"
+
+
+def test_raw_legal_acronym_can_prove_official_domain():
+    row = base_row(
+        name="VIKAS DISABLED CHARITABLE TRUST", referral_name="Vikasa Special School",
+        registration_reference="", registered_address="", pincode="",
+    )
+    assert kr.raw_acronym(row["name"]) == "VDCT"
+    result = kr.identity_verification(
+        row, "https://www.vdct.in/",
+        "VIKAS DISABLED CHARITABLE TRUST operates Vikasa Special School.",
+        "owned_site_candidate", fetch_metadata=metadata("VIKAS Disabled Charitable Trust"),
+    )
+    assert result["status"] == "verified_owned_site"
+
+
+def test_named_hosted_microsite_verifies_but_opaque_host_stays_manual():
+    hosted_row = base_row(
+        name="SADHANA", referral_name="Sadhana Raichur", public_name="Sadhana Raichur",
+        district="Raichur", registration_reference="", registered_address="", pincode="",
+    )
+    hosted = kr.identity_verification(
+        hosted_row, "https://sadhana.1ngo.in/", "Sadhana Raichur is a registered NGO in Raichur.",
+        "controlled_hosted_microsite_candidate", fetch_metadata=metadata("Sadhana Raichur"),
+    )
+    assert hosted["status"] == "verified_controlled_microsite"
+
+    opaque_row = base_row(
+        name="ANIKETHANA TRUST", referral_name="Anikethana PU College", public_name="Anikethana PU College",
+        registration_reference="", registered_address="", pincode="",
+    )
+    opaque = kr.identity_verification(
+        opaque_row, "https://60e40b6447e41.site123.me/",
+        "ANIKETHANA TRUST operates Anikethana PU College.",
+        "controlled_hosted_microsite_candidate", fetch_metadata=metadata("Anikethana PU College"),
+    )
+    assert opaque["status"] == "plausible_site_identity_review"
+    assert opaque["verified"] is False
+
+
+def test_explicit_project_parent_relationship_is_not_labeled_owned_domain():
+    row = base_row(
+        name="Arsha Gokulam", referral_name="Arsha Gokulam", project_name="Arsha Gokulam",
+        parent_organisation="Arsha Seva Kendram", registration_reference="", registered_address="", pincode="",
+    )
+    result = kr.identity_verification(
+        row, "https://www.arshasevakendram.org/seva/arsha-gokulam/",
+        "Arsha Gokulam is a project of Arsha Seva Kendram.",
+        "parent_or_project_candidate", fetch_metadata=metadata("Arsha Seva Kendram"),
+    )
+    assert result["status"] == "verified_parent_or_project_page"
+    assert result["ownership"] == "verified_parent_project_relationship"
+
+
+def test_historical_mismatch_url_is_revalidated_then_search_continues(monkeypatch, tmp_path):
+    service = kr.KarnatakaRecoveryService(tmp_path, 1_000_000)
+    row = base_row(
+        name="Shifting Orbits Foundation", referral_name="Shifting Orbits Foundation",
+        website="https://www.northsouth.org/", previous_website_status="mismatched_website",
+        recovery_mode="regression_test", registration_reference="", registered_address="", pincode="",
+    )
+    payload = {"organic": [
+        {"position": 1, "title": "Shifting Orbits Foundation", "link": "https://shiftingorbits.org/", "snippet": "Official website of Shifting Orbits Foundation"},
+    ]}
+
+    def fake_fetch(url, remaining):
+        if "northsouth" in url:
+            return {
+                "ok": True, "text": "NorthSouth supported a changemaker working with Shifting Orbits Foundation.",
+                "page_title": "NorthSouth", "og_site_name": "NorthSouth", "footer_text": "© NorthSouth",
+                "meta_description": "", "jsonld_org_names": [], "mailto": "", "tel": "",
+                "url": url, "status": 200, "fetch_status": "direct_ok", "error": "", "firecrawl_recommended": False,
+            }
+        return {
+            "ok": True, "text": "Shifting Orbits Foundation is a registered foundation.",
+            "page_title": "Shifting Orbits Foundation", "og_site_name": "Shifting Orbits Foundation", "footer_text": "© Shifting Orbits Foundation",
+            "meta_description": "", "jsonld_org_names": [], "mailto": "", "tel": "",
+            "url": url, "status": 200, "fetch_status": "direct_ok", "error": "", "firecrawl_recommended": False,
+        }
+
+    monkeypatch.setattr(kr, "fetch_direct", fake_fetch)
+    result, audit = service._process_row(
+        row, "regression_test", FakeSerperPool(payload), None,
+        {"lock": __import__("threading").RLock(), "logical_queries": 0, "query_cap": 4}, False, 60,
+    )
+    assert result["Website"].startswith("https://shiftingorbits.org")
+    assert result["Discovery Status"] == "verified_owned_site"
+    assert any(e.candidate_url.startswith("https://www.northsouth.org") and e.decision == "rejected_after_fetch_ownership_unproven" for e in audit)
+
+
+def test_known_official_fetch_failure_wins_over_directory_search_result(monkeypatch, tmp_path):
+    service = kr.KarnatakaRecoveryService(tmp_path, 1_000_000)
+    row = base_row(
+        name="Asha Kirana Seva Trust", referral_name="Asha Kirana Seva Trust",
+        website="https://ashakiranasevatrust.org/", recovery_mode="regression_test",
+        registration_reference="", registered_address="", pincode="",
+    )
+    payload = {"organic": [
+        {"position": 1, "title": "Asha Kirana Seva Trust", "link": "https://www.helpyourngo.com/ngo/1570/children/asha-kirana-seva-trust", "snippet": "NGO profile"},
+    ]}
+
+    def fake_fetch(url, remaining):
+        return {
+            "ok": False, "text": "", "url": url, "status": "failed", "fetch_status": "direct_failed",
+            "error": "SSL failure", "firecrawl_recommended": True,
+        }
+
+    monkeypatch.setattr(kr, "fetch_direct", fake_fetch)
+    result, _ = service._process_row(
+        row, "regression_test", FakeSerperPool(payload), None,
+        {"lock": __import__("threading").RLock(), "logical_queries": 0, "query_cap": 4}, False, 60,
+    )
+    assert result["Discovery Status"] == "candidate_fetch_pending"
+    assert "ashakiranasevatrust.org" in result["Website"]
+    assert "helpyourngo" not in result["Website"]
+
+
+def test_built_in_ownership_self_test_passes():
+    result = kr.run_ownership_self_test()
+    assert result["passed"] is True
+    assert result["failures"] == []

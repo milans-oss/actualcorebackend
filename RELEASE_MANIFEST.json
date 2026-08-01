@@ -1,19 +1,23 @@
 {
   "service": "DFP 2.0 core backend",
-  "version": "v85",
+  "version": "v88",
   "release_date": "2026-08-01",
   "railway_ready": true,
   "features": [
     "permanent NGO IDs",
     "historical NGO ID backfill",
-    "Karnataka Recovery core endpoints",
-    "single-Serper-compatible backend code"
+    "NGO ID registry export",
+    "ADMIN_PASSWORD-only mutation protection",
+    "source-record and ownership-evidence compatibility for Search Worker v76",
+    "Karnataka Recovery routes explicitly isolated to the search worker",
+    "Search Worker v76 and Frontend v158 compatibility"
   ],
   "tests": {
-    "pytest": "89 passed",
+    "pytest": "108 passed",
     "python_compile": "passed"
   },
   "notes": [
-    "Deploy to the existing core backend service and retain the existing /data volume."
+    "Deploy to the existing core backend service and retain the existing /data volume.",
+    "No separate mutation-token variables are used."
   ]
 }
