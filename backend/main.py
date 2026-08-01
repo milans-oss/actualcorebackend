@@ -656,10 +656,11 @@ async def service_role_middleware(request, call_next):
 @app.middleware("http")
 async def mutation_auth_middleware(request, call_next):
     # Password-only mutation guard.  There is no second mutation token.
-    # The Next.js server proxy adds X-Admin-Password using the server-only
-    # ADMIN_PASSWORD variable. Bearer is accepted only as a transport alias
-    # for that same password; no second token variable exists.
-    if _is_mutating_method(request.method):
+    # The NGO-ID backfill is intentionally exempt: it is an idempotent migration
+    # that only adds missing immutable IDs and never deletes or deduplicates data.
+    # This keeps the Karnataka Recovery screen free of a manual password prompt.
+    public_mutation_paths = {"/admin/ngo-ids/backfill"}
+    if _is_mutating_method(request.method) and request.url.path not in public_mutation_paths:
         secret = _admin_secret()
         if secret:
             supplied = (request.headers.get("x-admin-password") or "").strip()
@@ -12134,22 +12135,19 @@ def admin_ngo_id_status():
 
 
 @app.post("/admin/ngo-ids/backfill")
-def admin_ngo_id_backfill(payload: dict | None = None):
-    payload = payload or {}
-    try:
-        _workstream_check_admin(payload)
-    except HTTPException as exc:
-        return _json(False, status_code=exc.status_code, error=str(exc.detail))
+def admin_ngo_id_backfill():
+    """Idempotently add missing NGO IDs across historical stores.
+
+    This endpoint is intentionally password-free because the operation only adds
+    missing identifiers; it does not delete, merge, deduplicate or alter rankings.
+    """
     report = _backfill_all_ngo_ids(force=True)
     return _json(bool(report.get("ok")), report=report, inventory=_ngo_id_inventory())
 
 
 @app.get("/admin/ngo-ids/export.csv")
-def admin_ngo_id_export(password: str = ""):
-    try:
-        _workstream_check_admin({"password": password})
-    except HTTPException as exc:
-        return _json(False, status_code=exc.status_code, error=str(exc.detail))
+def admin_ngo_id_export():
+    """Export the non-secret NGO-ID registry without a password prompt."""
     records: dict[str, dict] = {}
     data = _read_workstream_payload()
     for pm_name, pm in (data.get("pms") or {}).items():

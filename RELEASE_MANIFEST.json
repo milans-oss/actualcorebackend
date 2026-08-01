@@ -1,19 +1,20 @@
 {
   "service": "DFP 2.0 core backend",
-  "version": "v88",
+  "version": "v89",
   "release_date": "2026-08-01",
   "railway_ready": true,
   "features": [
     "permanent NGO IDs",
     "historical NGO ID backfill",
     "NGO ID registry export",
-    "ADMIN_PASSWORD-only mutation protection",
+    "ADMIN_PASSWORD protection retained for consequential mutations",
     "source-record and ownership-evidence compatibility for Search Worker v76",
     "Karnataka Recovery routes explicitly isolated to the search worker",
-    "Search Worker v76 and Frontend v158 compatibility"
+    "Search Worker v77 and Frontend v160 compatibility",
+    "password-free idempotent NGO-ID backfill and registry export"
   ],
   "tests": {
-    "pytest": "108 passed",
+    "pytest": "109 passed",
     "python_compile": "passed"
   },
   "notes": [

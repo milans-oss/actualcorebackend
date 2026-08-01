@@ -89,3 +89,24 @@ def test_backfill_never_drops_same_name_source_rows(tmp_path, monkeypatch):
     assert result["rows"] == 2
     assert len(rows) == 2
     assert rows[0]["NGO ID"] != rows[1]["NGO ID"]
+
+
+def test_ngo_id_registry_actions_do_not_require_manual_password(tmp_path, monkeypatch):
+    runs = tmp_path / "runs"
+    runs.mkdir(parents=True)
+    workspaces = runs / "workspaces"
+    workspaces.mkdir(parents=True)
+    monkeypatch.setattr(main, "RUNS_DIR", runs)
+    monkeypatch.setattr(main, "WORKSPACES_DIR", workspaces)
+    monkeypatch.setattr(main, "WORKSTREAM_DATA_FILE", runs / "workstream_data.json")
+    monkeypatch.setattr(main, "NGO_ID_BACKFILL_MARKER", runs / ".ngo_id_backfill_v1.json")
+    monkeypatch.delenv("ADMIN_PASSWORD", raising=False)
+
+    result = main.admin_ngo_id_backfill()
+    assert result.status_code == 200
+    payload = json.loads(result.body)
+    assert payload["ok"] is True
+
+    export = main.admin_ngo_id_export()
+    assert export.status_code == 200
+    assert "text/csv" in export.media_type

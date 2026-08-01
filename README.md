@@ -1,4 +1,4 @@
-# DFP 2.0 Core Backend v88 — Final Railway Release
+# DFP 2.0 Core Backend v89 — Final Railway Release
 
 Complete core backend for Search Worker v76 and Frontend v158. Deploy it to the existing core-backend Railway service and preserve the existing `/data` volume.
 

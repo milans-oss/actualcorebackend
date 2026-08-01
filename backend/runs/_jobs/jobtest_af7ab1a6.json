@@ -1,0 +1,13 @@
+{
+  "run_id": "jobtest_af7ab1a6",
+  "job_type": "unit_test",
+  "status": "interrupted",
+  "stage": "interrupted_restart",
+  "run_dir": "/mnt/data/final_v89_backend_no_id_password/backend/runs/jobtest_af7ab1a6",
+  "owner_pid": 17757,
+  "cancel_requested": false,
+  "created_at": "2026-08-01T11:08:31Z",
+  "updated_at": "2026-08-01T11:08:31Z",
+  "interrupted_at": "2026-08-01T11:08:31Z",
+  "live_state": "not_running"
+}
