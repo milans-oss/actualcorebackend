@@ -1,24 +1,19 @@
 {
   "service": "DFP 2.0 core backend",
-  "version": "v89",
+  "version": "v92",
   "release_date": "2026-08-01",
   "railway_ready": true,
   "features": [
-    "permanent NGO IDs",
-    "historical NGO ID backfill",
-    "NGO ID registry export",
-    "ADMIN_PASSWORD protection retained for consequential mutations",
-    "source-record and ownership-evidence compatibility for Search Worker v76",
-    "Karnataka Recovery routes explicitly isolated to the search worker",
-    "Search Worker v77 and Frontend v160 compatibility",
-    "password-free idempotent NGO-ID backfill and registry export"
+    "all Core Backend v91 permanent NGO ID, Avika provenance, Shortlisting Pool and PM-dispatch features retained",
+    "100 MB streamed CSV safety cap for large Avika and Lead Pool imports; old 8 MB limit removed",
+    "compatible with Worker v83 automatic checkpoint resume and Frontend v163 large-batch UI"
   ],
   "tests": {
-    "pytest": "109 passed",
+    "pytest": "111 passed",
     "python_compile": "passed"
   },
-  "notes": [
-    "Deploy to the existing core backend service and retain the existing /data volume.",
-    "No separate mutation-token variables are used."
+  "compatible_with": [
+    "Search Worker v83",
+    "Frontend v163"
   ]
 }

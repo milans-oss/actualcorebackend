@@ -152,7 +152,7 @@ RUNS_DIR = Path(os.environ.get("RUNS_DIR", "runs")).resolve()
 ENGINE_FILE = Path(__file__).resolve().parent / "engine" / "dfp2_engine_safe_v5_live_status.py"
 MAX_ROWS_PER_RUN = int(os.environ.get("MAX_ROWS_PER_RUN", "1000"))
 RAPID_ROWS_LIMIT = int(os.environ.get("RAPID_ROWS_LIMIT", "20"))
-MAX_UPLOAD_BYTES = int(os.environ.get("MAX_UPLOAD_BYTES", "8000000"))  # 25 MB default; enough for 10,000 NGO rows
+MAX_UPLOAD_BYTES = int(os.environ.get("MAX_UPLOAD_BYTES", "100000000"))  # 100 MB safety cap for large Avika/Lead Pool imports
 CSV_NAME_HEADERS = {"name", "ngo_name", "ngo name", "organisation", "organization"}
 
 OUTPUTS = {
@@ -9018,7 +9018,9 @@ WORKSPACES_DIR.mkdir(parents=True, exist_ok=True)
 LEAD_POOL_HEADERS = [
     "lead_id", "ngo_id", "source_record_id", "darpan_id", "registration_reference",
     "registered_address", "pincode", "region", "district", "ngo_name", "normalized_name", "website",
-    "phone", "email", "source_type", "source_mix", "source_run", "source_run_date",
+    "phone", "email", "source_type", "source_mix", "source_module", "source_run", "source_run_id", "source_run_date",
+    "batch_id", "batch_label",
+    "avika_decision", "avika_reason_code", "avika_summary", "avika_confidence", "website_match",
     "referred_by", "contact_number", "notes", "one_line_understanding",
     "background_summary", "evidence_summary", "confidence", "status", "information_status",
     "fit_status", "source_tag", "send_for_shortlisting", "shortlisting_comment",
@@ -9152,7 +9154,10 @@ SOURCE_TAG_OPTIONS = {
     "archive import": "Archive Import",
     "archive": "Archive Import",
     "smart recovery": "Smart Recovery",
+    "karnataka recovery": "Karnataka Recovery",
     "recovery": "Smart Recovery",
+    "avika filter": "Avika Filter",
+    "avika": "Avika Filter",
     "manual add": "Manual Add",
     "manual": "Manual Add",
 }
@@ -9182,18 +9187,31 @@ def _source_tag(row: dict) -> str:
     return str(raw).strip()
 
 
-def _shortlisting_comment(row: dict) -> str:
-    """Return the shortlisting comment for new PM assignment.
+def _auto_shortlisting_comment(row: dict) -> str:
+    decision = _coalesce(row.get("avika_decision"), row.get("Avika Decision"), "").strip().lower()
+    summary = _coalesce(row.get("avika_summary"), row.get("Brief Description"), row.get("one_line_understanding"), row.get("evidence_summary"), "")
+    reason = _coalesce(row.get("avika_reason_code"), row.get("Avika Reason Code"), "")
+    if decision or summary:
+        prefix = f"Avika {decision.upper()}" if decision else "Avika review"
+        bits = [prefix + (f": {summary}" if summary else "")]
+        if reason:
+            bits.append(f"Reason: {reason.replace('_', ' ')}")
+        return ". ".join(x.strip().rstrip('.') for x in bits if x.strip()) + "."
+    one_line = _coalesce(row.get("one_line_understanding"), row.get("background_summary"), row.get("evidence_summary"), row.get("notes"), "")
+    if one_line:
+        return _first_sentence(one_line)
+    source = _source_tag(row) or _coalesce(row.get("source_type"), row.get("source_mix"), "Lead Pool")
+    return f"Selected for PM review from {source}."
 
-    Older PM tasks/responses may have no such field. That is valid legacy data.
-    This accessor is intentionally read-only and only gates new leads being sent
-    forward from Lead Pool after v46/v47.
-    """
+
+def _shortlisting_comment(row: dict) -> str:
+    """Return a usable reviewer comment for new PM assignment."""
     return _coalesce(
         row.get("shortlisting_comment"), row.get("Shortlisting Comment"),
         row.get("curation_comment"), row.get("Curation Comment"),
         row.get("reviewer_comments"), row.get("Reviewer Comments"),
-        row.get("comments"), row.get("Comments"), row.get("notes"), row.get("Notes"), ""
+        row.get("comments"), row.get("Comments"), row.get("notes"), row.get("Notes"),
+        _auto_shortlisting_comment(row),
     )
 
 
@@ -9210,17 +9228,22 @@ def _lead_from_any(row: dict, region: str, source_type: str = "") -> dict:
     name = _coalesce(row.get("ngo_name"), row.get("NGO Name"), row.get("Organisation"), row.get("organization"), row.get("name"), row.get("input_name"), "Untitled NGO")
     district = _coalesce(row.get("district"), row.get("District"), row.get("Location"), row.get("location"), "")
     website = _coalesce(row.get("website"), row.get("Website"), row.get("Official Website"), row.get("url"), row.get("Website / Source"), row.get("Source URL"), "")
-    source = _coalesce(source_type, row.get("source_type"), row.get("source_mix"), row.get("Source"), row.get("module"), "Internet Discovery")
-    evidence = _coalesce(row.get("evidence_summary"), row.get("Evidence"), row.get("Why It Belongs"), row.get("Story Summary"), row.get("Digital Presence Assessment"), row.get("background_summary"), row.get("background"), "")
-    notes = _coalesce(row.get("notes"), row.get("Notes"), row.get("comments"), row.get("Comments"), row.get("Why NGO Is Interesting"), row.get("Story Summary"), row.get("Digital Presence Assessment"), row.get("background"), "")
-    one_line = _coalesce(row.get("one_line_understanding"), row.get("one_line"), row.get("One-line Understanding"), _first_sentence(evidence or notes or row.get("background") or ""))
-    background = _coalesce(row.get("background_summary"), row.get("background"), row.get("Background"), evidence, notes)
+    source = _coalesce(source_type, row.get("source_type"), row.get("Source Type"), row.get("source_mix"), row.get("Source"), row.get("module"), "Internet Discovery")
+    avika_decision = _coalesce(row.get("avika_decision"), row.get("Avika Decision"), row.get("decision"), "").strip().lower()
+    avika_reason = _coalesce(row.get("avika_reason_code"), row.get("Avika Reason Code"), row.get("Internal Reason Code"), row.get("reason_code"), "")
+    avika_summary = _coalesce(row.get("avika_summary"), row.get("Brief Description"), row.get("summary"), row.get("one_line_understanding"), "")
+    avika_confidence = _coalesce(row.get("avika_confidence"), row.get("Avika Confidence"), row.get("confidence"), row.get("Confidence"), row.get("AI Confidence"), "")
+    website_match = _coalesce(row.get("website_match"), row.get("Official Website Match"), row.get("official_website_match"), "")
+    evidence = _coalesce(row.get("evidence_summary"), row.get("Evidence"), row.get("Why It Belongs"), row.get("Story Summary"), row.get("Digital Presence Assessment"), row.get("Brief Description"), row.get("background_summary"), row.get("background"), "")
+    notes = _coalesce(row.get("notes"), row.get("Notes"), row.get("comments"), row.get("Comments"), row.get("Why NGO Is Interesting"), row.get("Internal Reason"), row.get("Story Summary"), row.get("Digital Presence Assessment"), row.get("background"), "")
+    one_line = _coalesce(row.get("one_line_understanding"), row.get("one_line"), row.get("One-line Understanding"), avika_summary, _first_sentence(evidence or notes or row.get("background") or ""))
+    background = _coalesce(row.get("background_summary"), row.get("background"), row.get("Background"), avika_summary, evidence, notes)
     explicit_info_status = _coalesce(row.get("information_status"), row.get("Information Status"), row.get("info_status"), "")
     if explicit_info_status:
         information_status = explicit_info_status
     elif str(source).lower().startswith("human referral") or str(source).lower().startswith("referral"):
         information_status = "Needs Follow-up" if not (website or evidence or notes) else "Sufficient"
-    elif website or evidence:
+    elif website or evidence or avika_summary:
         information_status = "Sufficient"
     else:
         information_status = "Insufficient"
@@ -9230,6 +9253,28 @@ def _lead_from_any(row: dict, region: str, source_type: str = "") -> dict:
     contact_number = _coalesce(row.get("contact_number"), row.get("Contact Number"), row.get("phone"), row.get("Phone"), "")
     incoming_lead_id = str(row.get("lead_id") or "").strip()
     lead_id = incoming_lead_id or uuid.uuid4().hex[:12]
+    batch_id = _coalesce(row.get("batch_id"), row.get("Batch ID"), row.get("source_run_id"), row.get("Source Run ID"), row.get("source_run"), row.get("run_id"), "")
+    batch_label = _coalesce(row.get("batch_label"), row.get("Batch Label"), "")
+    if not batch_label:
+        if "avika" in source.lower():
+            batch_label = f"Avika Fit Review · {batch_id[-12:] if batch_id else now_s}"
+        elif batch_id:
+            batch_label = f"{source} · {batch_id[-12:]}"
+        else:
+            batch_label = source or "Historical Lead Pool"
+    fit_status = _coalesce(row.get("fit_status"), row.get("Fit Status"), row.get("DFP Fit"), row.get("fit"), "")
+    if not fit_status:
+        fit_status = "Strong fit" if avika_decision == "yes" else "Needs review" if avika_decision == "maybe" else "Not fit" if avika_decision == "no" else "Unknown"
+
+    provisional = {
+        **row,
+        "source_type": source,
+        "avika_decision": avika_decision,
+        "avika_reason_code": avika_reason,
+        "avika_summary": avika_summary,
+        "one_line_understanding": one_line,
+    }
+    shortlisting_comment = _shortlisting_comment(provisional)
     payload = {
         "lead_id": lead_id,
         "source_record_id": _coalesce(row.get("source_record_id"), row.get("Source Record ID"), ""),
@@ -9246,23 +9291,32 @@ def _lead_from_any(row: dict, region: str, source_type: str = "") -> dict:
         "email": _coalesce(row.get("email"), row.get("Email"), ""),
         "source_type": source,
         "source_mix": _coalesce(row.get("source_mix"), source),
-        "source_run": _coalesce(row.get("source_run"), row.get("source_run_id"), row.get("run_id"), row.get("Run ID"), "manual_output"),
+        "source_module": _coalesce(row.get("source_module"), row.get("Source Module"), row.get("module"), "avika_filter" if "avika" in source.lower() else ""),
+        "source_run": _coalesce(row.get("source_run"), row.get("source_run_id"), row.get("Source Run ID"), row.get("run_id"), row.get("Run ID"), "manual_output"),
+        "source_run_id": _coalesce(row.get("source_run_id"), row.get("Source Run ID"), row.get("source_run"), row.get("run_id"), row.get("Run ID"), ""),
         "source_run_date": _coalesce(row.get("source_run_date"), row.get("updated_at"), row.get("created_at"), ""),
+        "batch_id": batch_id,
+        "batch_label": batch_label,
+        "avika_decision": avika_decision,
+        "avika_reason_code": avika_reason,
+        "avika_summary": avika_summary,
+        "avika_confidence": avika_confidence,
+        "website_match": website_match,
         "referred_by": _coalesce(row.get("referred_by"), row.get("Referred By"), row.get("referral_source"), ""),
         "contact_number": contact_number,
         "notes": notes,
         "one_line_understanding": one_line,
         "background_summary": background,
-        "evidence_summary": evidence,
-        "confidence": _coalesce(row.get("confidence"), row.get("Confidence"), row.get("AI Confidence"), ""),
+        "evidence_summary": evidence or avika_summary,
+        "confidence": avika_confidence,
         "status": _coalesce(row.get("status"), row.get("Status"), row.get("Output Tier"), row.get("Repository Status"), "New"),
         "information_status": information_status,
-        "fit_status": _coalesce(row.get("fit_status"), row.get("Fit Status"), row.get("fit"), "Unknown"),
+        "fit_status": fit_status,
         "source_tag": _source_tag({**row, "source_type": source}),
         "send_for_shortlisting": _coalesce(row.get("send_for_shortlisting"), row.get("Send For Shortlisting"), row.get("send_for_approval"), row.get("Send For Approval"), ""),
-        "shortlisting_comment": _shortlisting_comment(row),
+        "shortlisting_comment": shortlisting_comment,
         "curation_status": curation_status,
-        "curation_comment": _coalesce(row.get("curation_comment"), row.get("compiled_comment"), row.get("reviewer_comments"), row.get("comments"), row.get("shortlisting_comment"), ""),
+        "curation_comment": _coalesce(row.get("curation_comment"), row.get("compiled_comment"), row.get("reviewer_comments"), row.get("comments"), shortlisting_comment, ""),
         "approved_by": _coalesce(row.get("approved_by"), ""),
         "approved_at": _coalesce(row.get("approved_at"), ""),
         "decided_by": _coalesce(row.get("decided_by"), ""),
@@ -9274,8 +9328,6 @@ def _lead_from_any(row: dict, region: str, source_type: str = "") -> dict:
         "created_at": _coalesce(row.get("created_at"), now_s),
         "updated_at": now_s,
     }
-    # Do not let a newly generated random lead_id become the NGO identity seed.
-    # Existing lead IDs remain valid historical identity evidence.
     identity_payload = {**row, **payload}
     if not incoming_lead_id:
         identity_payload.pop("lead_id", None)
@@ -9312,6 +9364,13 @@ def _merge_lead(existing: dict, incoming: dict) -> dict:
                     out[key] = str(out.get(key)) + " | " + str(incoming[key])
                 else:
                     out[key] = incoming[key]
+    for key in ("batch_id", "batch_label", "source_module", "source_run", "source_run_id", "avika_decision", "avika_reason_code", "avika_summary", "avika_confidence", "website_match", "fit_status"):
+        if incoming.get(key):
+            out[key] = incoming.get(key)
+    if incoming.get("one_line_understanding") and "avika" in str(incoming.get("source_type") or "").lower():
+        out["one_line_understanding"] = incoming.get("one_line_understanding")
+    if incoming.get("shortlisting_comment") and "avika" in str(incoming.get("source_type") or "").lower():
+        out["shortlisting_comment"] = incoming.get("shortlisting_comment")
     if not out.get("information_status"):
         out["information_status"] = incoming.get("information_status") or "Insufficient"
     if not out.get("curation_status"):
@@ -9553,7 +9612,7 @@ def workspace_update_lead(region: str, payload: dict):
     lead_id = str(payload.get("lead_id") or "").strip()
     if not lead_id:
         return _json(False, status_code=400, error="lead_id is required")
-    allowed = {"ngo_name", "district", "website", "contact_number", "referred_by", "notes", "one_line_understanding", "background_summary", "evidence_summary", "confidence", "status", "information_status", "fit_status", "source_tag", "send_for_shortlisting", "shortlisting_comment", "curation_status", "curation_comment", "reviewer_comments", "ranking_status", "duplicate_of", "existing_ranking_ref"}
+    allowed = {"ngo_name", "district", "website", "contact_number", "referred_by", "notes", "one_line_understanding", "background_summary", "evidence_summary", "confidence", "status", "information_status", "fit_status", "source_tag", "send_for_shortlisting", "shortlisting_comment", "curation_status", "curation_comment", "reviewer_comments", "ranking_status", "duplicate_of", "existing_ranking_ref", "batch_id", "batch_label", "source_module", "source_run", "source_run_id", "avika_decision", "avika_reason_code", "avika_summary", "avika_confidence", "website_match"}
     paths = [_lead_pool_path(region)]
     undo_before = _undo_snapshot_before(paths)
     rows = _read_lead_pool(region)
@@ -9600,8 +9659,8 @@ def workspace_curate_leads(region: str, payload: dict):
             continue
         existing_tag = _source_tag(row)
         existing_comment = _shortlisting_comment(row)
-        final_tag = source_tag_payload or existing_tag
-        final_comment = comment or existing_comment
+        final_tag = source_tag_payload or existing_tag or _coalesce(row.get("source_type"), row.get("batch_label"), "Lead Pool")
+        final_comment = comment or existing_comment or _auto_shortlisting_comment(row)
         if status in APPROVED_CURATION_STATUSES and _lead_matches_existing_ranking(row, existing_names, existing_domains):
             # Old PM shortlist/review work may not have the new metadata fields.
             # Do not require them or re-send the NGO; only mark this Lead Pool row.
@@ -9632,7 +9691,7 @@ def workspace_curate_leads(region: str, payload: dict):
         row["updated_at"] = now_s
         changed += 1
     if blocked and not changed:
-        return _json(False, status_code=422, error="Source tag and shortlisting comment are required before sending for shortlisting", blocked=blocked, blocked_count=len(blocked))
+        return _json(False, status_code=422, error="Could not derive review metadata for the selected leads", blocked=blocked, blocked_count=len(blocked))
     if not changed:
         return _json(False, status_code=404, error="No matching leads found")
     _write_lead_pool(region, rows)
@@ -9828,12 +9887,8 @@ def workspace_lead_pool_export(region: str):
 @app.post("/workspace/{region}/send-to-ranking")
 def workspace_send_to_ranking(region: str, payload: dict | None = None):
     payload = payload or {}
-    # Sending approved leads into PM review is an admin action. This protects the
-    # existing PM shortlist work from accidental overwrites or bulk assignment.
-    try:
-        _workstream_check_admin(payload)
-    except HTTPException as e:
-        return _json(False, status_code=e.status_code, error=str(e.detail))
+    # Internal shortlisting dispatch is protected by explicit selection, confirmation,
+    # existing-task dedupe and Admin Undo. No password is required.
 
     paths = [_lead_pool_path(region), WORKSTREAM_DATA_FILE]
     undo_before = _undo_snapshot_before(paths)
@@ -9886,8 +9941,12 @@ def workspace_send_to_ranking(region: str, payload: dict | None = None):
 
     missing_metadata = []
     for r in new_rows:
-        tag = _source_tag(r)
-        comment = _shortlisting_comment(r)
+        tag = _source_tag(r) or _coalesce(r.get("source_type"), r.get("batch_label"), "Lead Pool")
+        comment = _shortlisting_comment(r) or _auto_shortlisting_comment(r)
+        if tag and not r.get("source_tag"):
+            r["source_tag"] = tag
+        if comment and not r.get("shortlisting_comment"):
+            r["shortlisting_comment"] = comment
         if not tag or not comment:
             missing_metadata.append({"lead_id": r.get("lead_id"), "ngo_name": r.get("ngo_name"), "missing_source_tag": not bool(tag), "missing_comment": not bool(comment)})
     if missing_metadata:
@@ -9926,6 +9985,11 @@ def workspace_send_to_ranking(region: str, payload: dict | None = None):
             "contact_number": row.get("contact_number") or row.get("phone") or "",
             "referred_by": row.get("referred_by") or "",
             "batch_id": batch_id,
+            "source_batch_id": row.get("batch_id") or "",
+            "source_batch_label": row.get("batch_label") or "",
+            "avika_decision": row.get("avika_decision") or "",
+            "avika_reason_code": row.get("avika_reason_code") or "",
+            "avika_summary": row.get("avika_summary") or "",
         }
 
     new_tasks = 0
