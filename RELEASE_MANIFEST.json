@@ -1,0 +1,19 @@
+{
+  "service": "DFP 2.0 core backend",
+  "version": "v85",
+  "release_date": "2026-08-01",
+  "railway_ready": true,
+  "features": [
+    "permanent NGO IDs",
+    "historical NGO ID backfill",
+    "Karnataka Recovery core endpoints",
+    "single-Serper-compatible backend code"
+  ],
+  "tests": {
+    "pytest": "89 passed",
+    "python_compile": "passed"
+  },
+  "notes": [
+    "Deploy to the existing core backend service and retain the existing /data volume."
+  ]
+}
