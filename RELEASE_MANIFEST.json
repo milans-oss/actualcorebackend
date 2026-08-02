@@ -1,19 +1,27 @@
 {
   "service": "DFP 2.0 core backend",
-  "version": "v92",
-  "release_date": "2026-08-01",
+  "version": "v93",
+  "release_date": "2026-08-02",
   "railway_ready": true,
   "features": [
+    "Avika-to-Shortlisting-Pool imports and Lead Pool curation are password-free",
+    "Approve and send selected Shortlisting Pool NGOs to PMs is password-free",
     "all Core Backend v91 permanent NGO ID, Avika provenance, Shortlisting Pool and PM-dispatch features retained",
     "100 MB streamed CSV safety cap for large Avika and Lead Pool imports; old 8 MB limit removed",
     "compatible with Worker v83 automatic checkpoint resume and Frontend v163 large-batch UI"
   ],
   "tests": {
-    "pytest": "111 passed",
+    "pytest": "112 passed",
+    "password_free_operator_workflow_paths": "passed",
     "python_compile": "passed"
   },
   "compatible_with": [
-    "Search Worker v83",
+    "Search Worker v84",
     "Frontend v163"
+  ],
+  "release": "DFP2 Core Backend v93",
+  "notes": [
+    "Routine Avika and Shortlisting Pool actions rely on explicit selection, confirmation, duplicate checks and undo history instead of an admin-password prompt.",
+    "Unrelated administrative and final-output mutations remain password-protected."
   ]
 }

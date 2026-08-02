@@ -653,14 +653,30 @@ async def service_role_middleware(request, call_next):
         })
     return await call_next(request)
 
+def _public_operator_mutation_path(path: str) -> bool:
+    """Internal review actions that should never show a password prompt.
+
+    Avika selection and the Shortlisting Pool are routine operator workflows.
+    They remain protected by explicit row selection, confirmation, duplicate
+    checks and the undo log rather than by a second password field.
+    """
+    clean = (path or "/").rstrip("/") or "/"
+    if clean == "/admin/ngo-ids/backfill":
+        return True
+    parts = [part for part in clean.split("/") if part]
+    if len(parts) >= 3 and parts[0] == "workspace":
+        # /workspace/{region}/lead-pool/... and /workspace/{region}/send-to-ranking
+        if parts[2] == "lead-pool":
+            return True
+        if parts[2] == "send-to-ranking":
+            return True
+    return False
+
+
 @app.middleware("http")
 async def mutation_auth_middleware(request, call_next):
-    # Password-only mutation guard.  There is no second mutation token.
-    # The NGO-ID backfill is intentionally exempt: it is an idempotent migration
-    # that only adds missing immutable IDs and never deletes or deduplicates data.
-    # This keeps the Karnataka Recovery screen free of a manual password prompt.
-    public_mutation_paths = {"/admin/ngo-ids/backfill"}
-    if _is_mutating_method(request.method) and request.url.path not in public_mutation_paths:
+    # Keep passwords only for unrelated consequential admin mutations.
+    if _is_mutating_method(request.method) and not _public_operator_mutation_path(request.url.path):
         secret = _admin_secret()
         if secret:
             supplied = (request.headers.get("x-admin-password") or "").strip()
